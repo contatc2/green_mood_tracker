@@ -1,0 +1,3 @@
+graft green_mood_tracker
+global-exclude *.py[cod] __pycache__ *.so *.ipynb
+recursive-exclude  green_mood_tracker/jupy *
