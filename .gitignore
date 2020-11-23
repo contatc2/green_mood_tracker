@@ -10,6 +10,3 @@ groupama/data/base_pno.*
 .DS_Store
 .idea/
 /raw_data/
-green_mood_tracker/data/french.csv
-green_mood_tracker/data/sts_gold_tweet.csv
-green_mood_tracker/data/kaggle_sentiment_train.csv
