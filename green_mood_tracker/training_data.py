@@ -13,11 +13,11 @@ def get_raw_data():
     sts_gold_final['polarity'] = sts_gold_final.polarity.map({4:2,0:0})
     sts_gold_final['source'] = "sts_gold"
 
-    kaggle_sentiment_train['polarity'] = kaggle_sentiment_train.sentiment.map({'positive':4,'neutral':1,'negative':0})
+    kaggle_sentiment_train['polarity'] = kaggle_sentiment_train.sentiment.map({'positive':2,'neutral':1,'negative':0})
     kaggle_sentiment_train_final = kaggle_sentiment_train[['textID','text','polarity']].rename(columns={'textID':'id'})
     kaggle_sentiment_train_final['source'] = "kaggle_sentiment_train"
 
-    kaggle_sentiment_test['polarity'] = kaggle_sentiment_test.sentiment.map({'positive':4,'neutral':1,'negative':0})
+    kaggle_sentiment_test['polarity'] = kaggle_sentiment_test.sentiment.map({'positive':2,'neutral':1,'negative':0})
     kaggle_sentiment_test_final = kaggle_sentiment_test[['textID','text','polarity']].rename(columns={'textID':'id'})
     kaggle_sentiment_test_final['source'] = "kaggle_sentiment_test"
 
