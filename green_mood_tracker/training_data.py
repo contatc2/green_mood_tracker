@@ -10,7 +10,7 @@ def get_raw_data():
     sentiment140 = pd.read_csv('raw_data/training.1600000.processed.noemoticon.csv',encoding='latin-1',header=None,names=column_names)
 
     sts_gold_final = sts_gold[['id','tweet','polarity']].rename(columns={'tweet':'text'})
-    sts_gold_final['polarity'] = sts_gold_final.polarity.map({4:2})
+    sts_gold_final['polarity'] = sts_gold_final.polarity.map({4:2,0:0})
     sts_gold_final['source'] = "sts_gold"
 
     kaggle_sentiment_train['polarity'] = kaggle_sentiment_train.sentiment.map({'positive':4,'neutral':1,'negative':0})
@@ -22,7 +22,7 @@ def get_raw_data():
     kaggle_sentiment_test_final['source'] = "kaggle_sentiment_test"
 
     sentiment140_final = sentiment140[['id','text','polarity']]
-    sentiment140_final['polarity'] = sentiment140_final.polarity.map({4:2})
+    sentiment140_final['polarity'] = sentiment140_final.polarity.map({4:2,0:0})
     sentiment140_final['source'] = 'sentiment140'
 
     complete_data = pd.concat([sts_gold_final,kaggle_sentiment_train_final,kaggle_sentiment_test_final,sentiment140_final])
@@ -39,7 +39,7 @@ def get_raw_data_notebook():
     sentiment140 = pd.read_csv('../raw_data/training.1600000.processed.noemoticon.csv',encoding='latin-1',header=None,names=column_names)
 
     sts_gold_final = sts_gold[['id','tweet','polarity']].rename(columns={'tweet':'text'})
-    sts_gold_final['polarity'] = sts_gold_final.polarity.map({4:2})
+    sts_gold_final['polarity'] = sts_gold_final.polarity.map({4:2,0:0})
     sts_gold_final['source'] = "sts_gold"
 
     kaggle_sentiment_train['polarity'] = kaggle_sentiment_train.sentiment.map({'positive':2,'neutral':1,'negative':0})
@@ -51,7 +51,7 @@ def get_raw_data_notebook():
     kaggle_sentiment_test_final['source'] = "kaggle_sentiment_test"
 
     sentiment140_final = sentiment140[['id','text','polarity']]
-    sentiment140_final['polarity'] = sentiment140_final.polarity.map({4:2})
+    sentiment140_final['polarity'] = sentiment140_final.polarity.map({4:2,0:0})
     sentiment140_final['source'] = 'sentiment140'
 
     complete_data = pd.concat([sts_gold_final,kaggle_sentiment_train_final,kaggle_sentiment_test_final,sentiment140_final])
