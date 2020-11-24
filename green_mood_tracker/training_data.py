@@ -31,7 +31,7 @@ def get_raw_data(path = 'raw_data/', binary=False):
         complete_data_binary['polarity'] = complete_data_binary.polarity.map({4:1,0:0})
         return complete_data_binary
 
-    complete_data['polarity'] = complete_data.polarity.map({4:2,0:0})
+    complete_data['polarity'] = complete_data.polarity.map({4:2,0:0, 1:1})
     return complete_data
 
 def get_raw_data_notebook(binary=False):
