@@ -14,7 +14,8 @@ def clean(df, column):
     cachedStopWords = stopwords.words("english")
     lemmatizer = WordNetLemmatizer()
 
-    # df = pd.read_csv('../green_mood_tracker/data/sts_gold_tweet.csv', sep=';')
+    df[column] = df[column].apply(lambda x1: " ".join(
+        filter(lambda x2: x2[0] != '@', x1.split())))
     df[column] = df[column].apply(lambda x: x.translate(
         str.maketrans('', '', string.punctuation)))
     df[column] = df[column].apply(lambda x: x.translate(
