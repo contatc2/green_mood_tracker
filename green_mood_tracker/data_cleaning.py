@@ -1,6 +1,4 @@
-import nest_asyncio
-import sys
-from green_mood_tracker.twint_class import TWINT
+
 import pandas as pd
 import string
 from nltk.corpus import stopwords
