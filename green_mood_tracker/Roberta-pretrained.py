@@ -105,11 +105,6 @@ def sentence_encode():
 
     return ds_train_encoded, ds_val_encoded, ds_test_encoded
 
-max_length = 30
-batch_size = 256
-max_length = 30
-learning_rate = 7e-5
-number_of_epochs = 10
 
 #build model and compile
 def model_build(learning_rate=learning_rate,epsilon=1e-08):
@@ -119,10 +114,12 @@ def model_build(learning_rate=learning_rate,epsilon=1e-08):
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
     model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
+    return model
 
 
 # fit model
 def fit_model_and_save(number_of_epochs = number_of_epochs,):
+    model = model_build()
     ds_train_encoded, ds_val_encoded, ds_test_encoded = sentence_encode()
     es = EarlyStopping(patience=patience, restore_best_weights=True,monitor='val_accuracy')
     history = model.fit(ds_train_encoded, epochs=number_of_epochs,
@@ -135,7 +132,6 @@ def fit_model_and_save(number_of_epochs = number_of_epochs,):
     #models.save_model(model, 'enter_name_of_model')
 
 if __name__ == "__main__":
-    model_build()
     fit_model_and_save()
 
 

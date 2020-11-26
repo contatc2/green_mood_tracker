@@ -23,12 +23,12 @@ def get_raw_data(path = 'raw_data/', binary=False):
     sentiment140_final = sentiment140[['id','text','polarity']]
     sentiment140_final['source'] = 'sentiment140'
 
-    twitter_corpus = pd.read_csv('raw_data/twitter_corpus.csv',error_bad_lines=False)
+    twitter_corpus = pd.read_csv(path + 'twitter_corpus.csv',error_bad_lines=False)
     twitter_corpus_final = twitter_corpus[['TweetId','TweetText','Sentiment']].rename(columns={'TweetId':'id','TweetText':'text','Sentiment':'polarity'})
     twitter_corpus_final['source'] = "twitter_corpus"
     twitter_corpus_final['polarity'] = twitter_corpus_final.polarity.map({'positive':2,'neutral':1,'negative':0})
 
-    complete_data = pd.concat([sts_gold_final,kaggle_sentiment_train_final,kaggle_sentiment_test_final,sentiment140_final,twitter_corpus_final])
+    complete_data = pd.concat([sts_gold_final,kaggle_sentiment_train_final,kaggle_sentiment_test_final,twitter_corpus_final])
     complete_data = complete_data.dropna()
 
     if binary:
