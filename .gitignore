@@ -11,3 +11,4 @@ groupama/data/base_pno.*
 .idea/
 /raw_data/
 notebooks/download_train-Leonardo.ipynb
+notebooks/contatc2_cloud-test.ipynb
