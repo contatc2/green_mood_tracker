@@ -10,3 +10,7 @@ yapf
 python-gitlab
 twine
 twint
+absl-py
+tensorflow-datasets
+transformers
+tensorflow
