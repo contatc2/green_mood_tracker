@@ -13,8 +13,7 @@ from sklearn.model_selection import train_test_split
 from green_mood_tracker.training_data import get_raw_data
 from green_mood_tracker.data_cleaning import clean
 import tensorflow_datasets as tfds
-from transformers import TFRobertaForSequenceClassification
-from transformers import RobertaTokenizer
+from transformers import TFRobertaForSequenceClassification, AdamWeightDecay, RobertaTokenizer
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import models
 
@@ -109,7 +108,7 @@ def sentence_encode():
 #build model and compile
 def model_build(learning_rate=learning_rate,epsilon=1e-08):
     model = TFRobertaForSequenceClassification.from_pretrained("roberta-base")
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate, epsilon=epsilon)
+    optimizer = AdamWeightDecay(learning_rate=learning_rate, epsilon=epsilon, weight_decay=0)
     # we do not have one-hot vectors, we can use sparce categorical cross entropy and accuracy
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
