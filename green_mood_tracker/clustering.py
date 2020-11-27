@@ -9,6 +9,7 @@ import numpy as np
 import seaborn as sns
 from wordcloud                        import WordCloud
 from data_cleaning import clean
+from sklearn.decomposition import LatentDirichletAllocation
 
 
 def vectorizer(df, column):
@@ -28,6 +29,7 @@ def randomized_search(df, column):
     parameters = {
         'n_clusters': range(1, 20),
         'n_init': [10, 20, 30],
+        'max_iter': [300, 500, 1000]
         }
     rs_search = RandomizedSearchCV(KMeans(), parameters, n_jobs=-1,
                                verbose=1,
@@ -39,7 +41,8 @@ def grid_search(df, column):
     tf_idf, X = vectorizer(df, column)
     parameters = {
         'n_clusters': range(1, 20),
-        'n_init': [10, 20, 30]
+        'n_init': [10, 20, 30],
+        'max_iter': [300, 500, 1000]
         }
     grid_search = GridSearchCV(KMeans(), parameters, n_jobs=-1,
                                   verbose=1,
@@ -135,5 +138,34 @@ def generateWordClouds(df, column, n_feats):
         plt.axis("off")
         plt.show()
 
+
+def get_lda(df, column):
+    tf_idf, X = vectorizer(df, column)
+    params = {'n_components': [2, 4, 5, 10, 20, 50],
+     'learning_decay': [.5, 0.7, 0.9],
+     'max_iter': [300, 500, 1000]
+     }
+    lda = LatentDirichletAllocation()
+    lda_search = GridSearchCV(lda, param_grid = params)
+    lda_search.fit(X)
+    # Best Model
+    best_lda_model = lda_search.best_estimator_
+    # Model Parameters
+    params = lda_search.best_params_
+    # Log Likelihood Score
+    score = lda_search.best_score_
+    # Perplexity
+    perplexity = best_lda_model.perplexity(tf_idf)
+
+    df_topic_keywords = pd.DataFrame(best_lda_model.components_)
+    df_topic_keywords.columns = tf_idf.columns
+    topicnames = ["Topic " + str(i) for i in range(df_topic_keywords.index[-1]+1)]
+    df_topic_keywords.index = topicnames
+
+    return df_topic_keywords
+
+
+
+=======
 if __name__ == '__main__':
     main()
