@@ -1,12 +1,12 @@
 import os
 import joblib
+import sys
 
 from google.cloud import storage
 from termcolor import colored
 
 from green_mood_tracker.params import BUCKET_NAME, BUCKET_FOLDER, MODEL_NAME, MODEL_VERSION
 
-import sys
 
 
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='model.joblib', rm=False):
@@ -26,19 +26,20 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
 
     blob = client.blob(storage_location)
     blob.upload_from_filename(filename=saved_model_path)
-    print(colored("=> model.joblib uploaded to bucket {} inside {}".format(BUCKET_NAME, storage_location),
+    print(colored("=> {} uploaded to bucket {} inside {}".format(model_filename, BUCKET_NAME, storage_location),
                   "green"))
     if rm:
         os.remove(saved_model_path)
 
 
-def storage_upload_data(filename, bucket=BUCKET_NAME, rm=False):
+def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=False):
     sys.path.insert(0, '../')
     root = 'raw_data/'
     file_path = root + filename
     client = storage.Client().bucket(bucket)
-    storage_location = '{}/{}'.format(
+    storage_location = '{}/{}/{}'.format(
         'data',
+        folder,
         filename
     )
     blob = client.blob(storage_location)

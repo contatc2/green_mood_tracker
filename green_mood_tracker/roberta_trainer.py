@@ -129,7 +129,7 @@ class RobertaTrainer(MlFlowTrainer):
         root = '../models/'
         model_filename = 'roBERTa.tf'
         self.model.save(root+model_filename)
-        print(colored("roBERTa.joblib saved locally", "green"))
+        print(colored("roBERTa.tf saved locally", "green"))
 
         if upload:
             storage_upload_models(model_name='RoBERTa', model_version=MODEL_VERSION,

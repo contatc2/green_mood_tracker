@@ -20,7 +20,7 @@ def get_data(nrows=10000, local=False, binary=True, **kwargs):
     else:
         # binary or not
         # which data source do we want to keep?
-        path = "gs://{}/{}/{}".format(BUCKET_NAME, 'data', 'data_binary.csv')
+        path = "gs://{}/{}/{}/{}".format(BUCKET_NAME, 'data', 'training_data', 'data_binary.csv')
         df = pd.read_csv(path, nrows=nrows)
         return df
 
