@@ -17,13 +17,13 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
 
 
-
 batch_size = 256
 max_length = 30
 learning_rate = 7e-5
 epsilon = 1e-8
 number_of_epochs = 10
 patience = 5
+
 
 class RobertaTrainer(MlFlowTrainer):
 
@@ -39,23 +39,35 @@ class RobertaTrainer(MlFlowTrainer):
         self.val_split = self.kwargs.get("val_split", True)
         if self.split:
             self.sentence_train, self.sentence_test, self.y_train, self.y_test =\
-             train_test_split(self.X_train, self.y_train, test_size=0.3, random_state=0)
+                train_test_split(self.X_train, self.y_train,
+                                 test_size=0.3, random_state=0)
             if self.val_split:
                 self.sentence_train, self.sentence_val, self.y_train, self.y_val =\
-                train_test_split(self.sentence_train, self.y_train, test_size=0.3, random_state = 0)
+                    train_test_split(
+                        self.sentence_train, self.y_train, test_size=0.3, random_state=0)
+
+        self.ds_train_encoded = None
+        self.ds_test_encoded = None
+        self.ds_val_encoded = None
 
     def sentence_encode_all(self, batch_size=256):
         # How can we use a pipeline here?
-        ## encoded modified features with tokenizer and added batch size
-        ds_train_encoded = RobertaEncoder(self.sentence_train, self.y_train).sentence_encode(batch_size, shuffle=True)
-        ds_val_encoded = RobertaEncoder(self.sentence_val, self.y_val).sentence_encode(batch_size)
-        ds_test_encoded = RobertaEncoder(self.sentence_test, self.y_test).sentence_encode(batch_size)
-        return ds_train_encoded, ds_val_encoded, ds_test_encoded
+        # encoded modified features with tokenizer and added batch size
 
+        self.ds_train_encoded = RobertaEncoder(
+            self.sentence_train, self.y_train).sentence_encode(batch_size, shuffle=True)
+        if self.split:
+            ds_test_encoded = RobertaEncoder(
+                self.sentence_test, self.y_test).sentence_encode(batch_size)
+        if self.val_split:
+            ds_val_encoded = RobertaEncoder(
+                self.sentence_val, self.y_val).sentence_encode(batch_size)
 
-    def build_estimator(self, learning_rate=learning_rate,epsilon=1e-08):
-        model = TFRobertaForSequenceClassification.from_pretrained("roberta-base")
-        optimizer = AdamWeightDecay(learning_rate=learning_rate, epsilon=epsilon, weight_decay=0)
+    def build_estimator(self, learning_rate=learning_rate, epsilon=1e-08):
+        model = TFRobertaForSequenceClassification.from_pretrained(
+            "roberta-base")
+        optimizer = AdamWeightDecay(
+            learning_rate=learning_rate, epsilon=epsilon, weight_decay=0)
         # we do not have one-hot vectors, we can use sparce categorical cross entropy and accuracy
         loss = SparseCategoricalCrossentropy(from_logits=True)
         metric = SparseCategoricalAccuracy('accuracy')
@@ -68,45 +80,45 @@ class RobertaTrainer(MlFlowTrainer):
 
         """
         # Here add randomseearch to your pipeline
-        grid_params = {'rgs__' + k: v  for k, v in self.model_params.items()}
+        grid_params = {'rgs__' + k: v for k, v in self.model_params.items()}
 
         self.model = RandomizedSearchCV(
-                self.model,
-                grid_params,
-                n_iter=20,
-                n_jobs=None,
-                scoring= accuracy,
-                cv=5,
-            )
+            self.model,
+            grid_params,
+            n_iter=20,
+            n_jobs=None,
+            scoring=accuracy,
+            cv=5,
+        )
 
     @simple_time_tracker
-    def train(self, number_of_epochs = number_of_epochs):
+    def train(self, number_of_epochs=number_of_epochs):
         # how do we want to pass the number of epochs
         tic = time.time()
         self.build_estimator()
-        ds_train_encoded = self.sentence_encode_all()[0]
+        self.sentence_encode_all(batch_size=256)
         if self.gridsearch:
             self.add_grid_search()
-        early_stop = EarlyStopping(patience=patience, restore_best_weights=True,monitor='val_accuracy')
-        self.model.fit(ds_train_encoded, epochs=number_of_epochs,
-                  validation_data=ds_val_encoded, callbacks=[early_stop])
+        early_stop = EarlyStopping(
+            patience=patience, restore_best_weights=True, monitor='val_accuracy')
+        history = self.model.fit(self.ds_train_encoded, epochs=number_of_epochs,
+                                 validation_data=ds_val_encoded, callbacks=[early_stop])
         # can we use a validation split here instead?
         self.mlflow_log_metric("train_time", int(time.time() - tic))
-
+        return history
 
     def evaluate(self):
-        ds_train_encoded, _ , ds_test_encoded = self.sentence_encode_all()
-        accuracy =  self.model.evaluate(ds_train_encoded)[1]
+        accuracy = self.model.evaluate(self.ds_train_encoded)[1]
         self.mlflow_log_metric("train_accuracy", accuracy)
         if self.split:
-            accuracy_val = self.model.evaluate(ds_test_encoded)[1]
-            self.mlflow_log_metric("accuracy_val", accuracy_val)
+            accuracy_test = self.model.evaluate(self.ds_test_encoded)[1]
+            self.mlflow_log_metric("test_accuracy", accuracy_test)
             if self.gridsearch:
                 self.log_estimator_params()
-            print(colored("accuracy train: {} || accuracy test: {}".format(accuracy, accuracy_val), "blue"))
+            print(colored("accuracy train: {} || accuracy test: {}".format(
+                accuracy, accuracy_val), "blue"))
         else:
             print(colored("accuracy train: {}".format(accuracy), "blue"))
-
 
     def save_model(self, upload=True, auto_remove=True, **kwargs):
         """Save the model into a .joblib and upload it on Google Storage /models folder
@@ -126,7 +138,6 @@ class RobertaTrainer(MlFlowTrainer):
         # params = reg.get_params()
         # for k, v in params.items():
         #     self.mlflow_log_param(k, v)
-
 
 
 if __name__ == "__main__":
