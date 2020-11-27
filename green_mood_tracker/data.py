@@ -1,3 +1,4 @@
+from green_mood_tracker.params import BUCKET_NAME, BUCKET_FOLDER, MODEL_NAME, MODEL_VERSION
 import pandas as pd
 from google.cloud import storage
 from green_mood_tracker.training_data import get_raw_data
@@ -19,9 +20,10 @@ def get_data(nrows=10000, local=False, binary=True, **kwargs):
     else:
         # binary or not
         # which data source do we want to keep?
-        path = "gs://{}/{}".format(BUCKET_NAME, BUCKET_TRAIN_DATA_PATH)
+        path = "gs://{}/{}/{}".format(BUCKET_NAME, 'data', 'data_binary.csv')
         df = pd.read_csv(path, nrows=nrows)
         return df
+
 
 def clean(df, column):
 
@@ -45,7 +47,8 @@ def clean(df, column):
 
 if __name__ == '__main__':
     params = dict(nrows=10000,
-                  local=True,  # set to False to get data from GCP (Storage or BigQuery)
+                  # set to False to get data from GCP (Storage or BigQuery)
+                  local=True,
                   binary=True)
     df = get_data(**params)
     print(df.shape)
