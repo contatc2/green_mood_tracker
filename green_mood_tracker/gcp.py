@@ -12,7 +12,7 @@ import sys
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='model.joblib', rm=False):
 
     sys.path.insert(0, '../')
-    root = 'models/'
+    saved_model_path = 'models/RoBERTa.tf/saved_model.pb'
     client = storage.Client().bucket(bucket_name)
 
     BUCKET_FOLDER = 'models'
@@ -25,16 +25,17 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
     )
 
     blob = client.blob(storage_location)
-    blob.upload_from_filename(filename=root+model_filename)
+    blob.upload_from_filename(filename=saved_model_path)
     print(colored("=> model.joblib uploaded to bucket {} inside {}".format(BUCKET_NAME, storage_location),
                   "green"))
     if rm:
-        os.remove(root+model_filename)
+        os.remove(saved_model_path)
 
 
 def storage_upload_data(filename, bucket=BUCKET_NAME, rm=False):
-    root_path = '../raw_data/'
-    file_path = root_path + filename
+    sys.path.insert(0, '../')
+    root = 'raw_data/'
+    file_path = root + filename
     client = storage.Client().bucket(bucket)
     storage_location = '{}/{}'.format(
         'data',
