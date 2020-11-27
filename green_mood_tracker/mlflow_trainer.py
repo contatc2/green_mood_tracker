@@ -4,7 +4,7 @@ from memoized_property import memoized_property
 from mlflow.tracking import MlflowClient
 from psutil import virtual_memory
 
-EXPERIMENT_NAME = "[GB] [London] [green_mood_tracker] word2vec"
+EXPERIMENT_NAME = "[GB] [London] [green_mood_tracker] RoBERTa"
 MLFLOW_URI = "https://mlflow.lewagon.co/"
 
 class MlFlowTrainer(object):

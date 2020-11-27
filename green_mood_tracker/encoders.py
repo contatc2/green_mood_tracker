@@ -1,8 +1,13 @@
+import numpy as np
 
 from transformers import RobertaTokenizer
 import tensorflow_datasets as tfds
 # from tensorflow.data.Dataset import from_tensor_slices
 from green_mood_tracker.utils import map_example_to_dict
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from sklearn.base import BaseEstimator, TransformerMixin
+
+import gensim.downloader as api
 import tensorflow as tf
 
 MAX_LENGTH = 30
@@ -60,3 +65,44 @@ class RobertaEncoder():
         if shuffle:
             return self.encode_examples(sentences_modified).shuffle(10000).batch(batch_size)
         return self.encode_examples(sentences_modified).batch(batch_size)
+
+
+class Word2VecEncoder(BaseEstimator, TransformerMixin):
+
+    def __init__(self, sentences=None):
+        self.sentences = sentences
+        self.word2vec = None
+        self.embedding = []
+
+    def get_word2vec(self):
+        self.word2vec = api.load("glove-twitter-100")
+
+    def embed_sentence(self, sentence):
+        embedded_sentence = []
+        for word in sentence:
+            if word in self.word2vec.wv.vocab.keys():
+                vector = self.word2vec.wv[word]
+                embedded_sentence.append(vector)
+        return np.array(embedded_sentence)
+
+    def embedding_pipeline(self):
+        # Sentences to list of words
+        self.get_word2vec()
+        for sentence in self.sentences.map(lambda x: x.split()):
+            embedded_sentence = self.embed_sentence(sentence)
+            self.embedding.append(embedded_sentence)
+        # Pad the inputs
+        return pad_sequences(self.embedding, dtype='float32', padding='post')
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X, y=None):
+        # Sentences to list of words
+        self.get_word2vec()
+        for sentence in X.map(lambda x: x.split()):
+            embedded_sentence = self.embed_sentence(sentence)
+            self.embedding.append(embedded_sentence)
+        # Pad the inputs
+        X = pad_sequences(self.embedding, dtype='float32', padding='post')
+        return X
