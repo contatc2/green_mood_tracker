@@ -6,31 +6,41 @@ from termcolor import colored
 
 from green_mood_tracker.params import BUCKET_NAME, BUCKET_FOLDER, MODEL_NAME, MODEL_VERSION
 
+import sys
 
-def storage_upload(model_version=MODEL_VERSION, bucket=BUCKET_NAME, rm=False):
-    client = storage.Client().bucket(bucket)
-    model_name = 'model.joblib'
+
+def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='model.joblib', rm=False):
+
+    sys.path.insert(0, '../')
+    saved_model_path = 'models/RoBERTa.tf/saved_model.pb'
+    client = storage.Client().bucket(bucket_name)
+
+    BUCKET_FOLDER = 'models'
+
     storage_location = '{}/{}/{}/{}'.format(
         BUCKET_FOLDER,
-        MODEL_NAME,
+        model_name,
         model_version,
-        model_name
-        )
+        model_filename
+    )
+
     blob = client.blob(storage_location)
-    blob.upload_from_filename(filename=model_name)
+    blob.upload_from_filename(filename=saved_model_path)
     print(colored("=> model.joblib uploaded to bucket {} inside {}".format(BUCKET_NAME, storage_location),
                   "green"))
     if rm:
-        os.remove('model.joblib')
+        os.remove(saved_model_path)
 
-def storage_upload_data( filename, bucket=BUCKET_NAME, rm=False):
-    root_path = '../raw_data/'
-    file_path = root_path + filename
+
+def storage_upload_data(filename, bucket=BUCKET_NAME, rm=False):
+    sys.path.insert(0, '../')
+    root = 'raw_data/'
+    file_path = root + filename
     client = storage.Client().bucket(bucket)
     storage_location = '{}/{}'.format(
         'data',
         filename
-        )
+    )
     blob = client.blob(storage_location)
     blob.upload_from_filename(filename=file_path)
     print(colored("=> {} uploaded to bucket {} inside {}".format(filename, BUCKET_NAME, storage_location),
@@ -47,7 +57,7 @@ def download_model(model_version=MODEL_VERSION, bucket=BUCKET_NAME, rm=True):
         MODEL_NAME,
         model_version,
         model_name
-        )
+    )
     blob = client.blob(storage_location)
     blob.download_to_filename(model_name)
     print(f"=> pipeline downloaded from storage")
