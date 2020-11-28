@@ -71,17 +71,17 @@ class Word2VecEncoder(BaseEstimator, TransformerMixin):
 
     def __init__(self, sentences=None):
         self.sentences = sentences
-        self.word2vec = None
+        self.vectors = None
         self.embedding = []
 
     def get_word2vec(self):
-        self.word2vec = api.load("glove-twitter-100")
+        self.vectors = api.load("glove-twitter-100")
 
     def embed_sentence(self, sentence):
         embedded_sentence = []
         for word in sentence:
-            if word in self.word2vec.wv.vocab.keys():
-                vector = self.word2vec.wv[word]
+            if word in self.vectors.vocab.keys():
+                vector = self.vectors[word]
                 embedded_sentence.append(vector)
         return np.array(embedded_sentence)
 

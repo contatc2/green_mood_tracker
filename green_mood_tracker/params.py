@@ -13,7 +13,7 @@ BUCKET_NAME ='green-mood-tracker-01'
 
 ##### Model - - - - - - - - - - - - - - - - - - - - - - - -
 
-BUCKET_FOLDER='models'
+MODELS_FOLDER = 'models'
 # model folder name (will contain the folders for all trained model versions)
 MODEL_NAME = 'RoBERTa'
 

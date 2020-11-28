@@ -9,16 +9,16 @@ from green_mood_tracker.params import MODEL_VERSION
 from green_mood_tracker.gcp import storage_upload_models
 from green_mood_tracker.utils import simple_time_tracker
 
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras import models, layers
-from tensorflow.keras.wrappers import scikit_learn
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 
 
 BATCH_SIZE = 32
 # learning_rate = 7e-5
 # epsilon = 1e-8
-NUM_OF_EPOCHS = 50
+NUM_OF_EPOCHS = 3
 PATIENCE = 5
 
 
@@ -50,11 +50,11 @@ class Word2VecTrainer(MlFlowTrainer):
     def create_embedding(self):
         # How can we use a pipeline here?
         # encoded modified features with tokenizer and added batch size
-        self.X_train = Word2VecEncoder(self.X_train).embedding_pipeline()
+        self.X_train = Word2VecEncoder().transform(self.X_train)
         if self.split:
-            self.X_test = Word2VecEncoder(self.X_test).embedding_pipeline()
+            self.X_test = Word2VecEncoder().transform(self.X_test)
         if self.val_split:
-            self.X_val = Word2VecEncoder(self.X_val).embedding_pipeline()
+            self.X_val = Word2VecEncoder().transform(self.X_val)
 
 
     def build_estimator(self):
@@ -90,7 +90,7 @@ class Word2VecTrainer(MlFlowTrainer):
         )
 
     @simple_time_tracker
-    def train(self, number_of_epochs=number_of_epochs):
+    def train(self):
         # how do we want to pass the number of epochs
         tic = time.time()
         self.build_estimator()
@@ -120,7 +120,7 @@ class Word2VecTrainer(MlFlowTrainer):
     def save_model(self, upload=True, auto_remove=True, **kwargs):
         """Save the model and upload it on Google Storage /models folder
         """
-        root = '../models/'
+        root = 'models/'
         model_filename = 'word2vec.h5'
         self.model.save(root+model_filename)
         print(colored("wor2vec.h5 saved locally", "green"))
