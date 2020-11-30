@@ -31,6 +31,7 @@ class RobertaTrainer(MlFlowTrainer):
         super().__init__(kwargs['experiment_name'], kwargs['mlflow'])
         self.model = None
         self.kwargs = kwargs
+        self.local = self.kwargs.get("local", True)
         self.X_train = X
         self.y_train = y
         del X, y
@@ -125,15 +126,18 @@ class RobertaTrainer(MlFlowTrainer):
         """Save the model into a .joblib and upload it on Google Storage /models folder
         HINTS : use sklearn.joblib (or jbolib) libraries and google-cloud-storage"""
 
+        
+
         # how do we put stuff in the models folder??? right path?
         root = '../models/'
         model_filename = 'roBERTa.tf'
-        self.model.save(root+model_filename)
+        self.model.save_pretrained(root+model_filename)
         print(colored("roBERTa.tf saved locally", "green"))
 
         if upload:
             storage_upload_models(model_name='RoBERTa', model_version=MODEL_VERSION,
-                                  model_filename=model_filename, rm=auto_remove)
+                                    model_filename=model_filename, rm=auto_remove)
+
 
     def log_estimator_params(self):
         # reg = self.get_estimator()
@@ -151,7 +155,7 @@ if __name__ == "__main__":
 
     params = dict(nrows=100,
                   upload=True,
-                  local=False,  # set to False to get data from AWS
+                  local=False,
                   mlflow=True,  # set to True to log params to mlflow
                   experiment_name=EXPERIMENT
                   )
