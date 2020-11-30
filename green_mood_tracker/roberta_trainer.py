@@ -126,9 +126,6 @@ class RobertaTrainer(MlFlowTrainer):
         """Save the model into a .joblib and upload it on Google Storage /models folder
         HINTS : use sklearn.joblib (or jbolib) libraries and google-cloud-storage"""
 
-        
-
-        # how do we put stuff in the models folder??? right path?
         root = '../models/'
         model_filename = 'roBERTa.tf'
         self.model.save_pretrained(root+model_filename)
@@ -136,8 +133,7 @@ class RobertaTrainer(MlFlowTrainer):
 
         if upload:
             storage_upload_models(model_name='RoBERTa', model_version=MODEL_VERSION,
-                                    model_filename=model_filename, rm=auto_remove)
-
+                                  model_filename=model_filename, rm=auto_remove)
 
     def log_estimator_params(self):
         # reg = self.get_estimator()

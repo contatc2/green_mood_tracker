@@ -20,7 +20,8 @@ def get_data(nrows=10000, local=False, binary=True, **kwargs):
     else:
         # binary or not
         # which data source do we want to keep?
-        path = "gs://{}/{}/{}/{}".format(BUCKET_NAME, 'data', 'training_data', 'data_binary.csv')
+        path = "gs://{}/{}/{}/{}".format(BUCKET_NAME,
+                                         'data', 'training_data', 'data_binary.csv')
         df = pd.read_csv(path, nrows=nrows)
         return df
 
@@ -44,6 +45,7 @@ def clean(df, column='text'):
 
     return df
 
+
 def clean_series(ds):
 
     cachedStopWords = stopwords.words("english")
@@ -51,15 +53,15 @@ def clean_series(ds):
 
     ds = ds.map(lambda x1: " ".join(
         filter(lambda x2: x2[0] != '@', x1.split())))\
-    .map(lambda x: x.translate(
-        str.maketrans('', '', string.punctuation)))\
-    .map(lambda x: x.translate(
-        str.maketrans('', '', string.digits)))\
-    .map(lambda x: x.lower())\
-    .map(lambda x:
-        [lemmatizer.lemmatize(word) for word in x.split()])\
-    .map(lambda x:
-        [word for word in x if word not in cachedStopWords])
+        .map(lambda x: x.translate(
+            str.maketrans('', '', string.punctuation)))\
+        .map(lambda x: x.translate(
+            str.maketrans('', '', string.digits)))\
+        .map(lambda x: x.lower())\
+        .map(lambda x:
+             [lemmatizer.lemmatize(word) for word in x.split()])\
+        .map(lambda x:
+             [word for word in x if word not in cachedStopWords])
 
     return ds
 
