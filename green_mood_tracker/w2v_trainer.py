@@ -18,7 +18,7 @@ from tensorflow.keras import models, layers
 BATCH_SIZE = 32
 # learning_rate = 7e-5
 # epsilon = 1e-8
-NUM_OF_EPOCHS = 3
+NUM_OF_EPOCHS = 1
 PATIENCE = 5
 
 
@@ -96,7 +96,7 @@ class Word2VecTrainer(MlFlowTrainer):
     def save_model(self, upload=True, auto_remove=True, **kwargs):
         """Save the model and upload it on Google Storage /models folder
         """
-        root = 'models/'
+        root = 'models'
         model_filename = 'word2vec.h5'
         self.model.save(os.path.join(root,model_filename))
         print(colored("wor2vec.h5 saved locally", "green"))

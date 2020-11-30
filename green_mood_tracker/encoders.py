@@ -14,14 +14,13 @@ import tensorflow as tf
 MAX_LENGTH = 30
 
 
-class RobertaEncoder():
+class RobertaEncoder(BaseEstimator, TransformerMixin):
 
-    def __init__(self, sentence, y):
-        self.sentence = sentence
-        self.y = y
+    def __init__(self, batch_size):
         self.input_ids_list = []
         self.attention_mask_list = []
         self.label_list = []
+        self.batch_size = batch_size
 
     def convert_example_to_feature(self, entry):
         # combine step for tokenization, WordPiece vector mapping
@@ -58,14 +57,19 @@ class RobertaEncoder():
         return tf.data.Dataset.from_tensor_slices((self.input_ids_list, self.attention_mask_list, self.label_list))\
             .map(map_example_to_dict)
 
-    def sentence_encode(self, batch_size, shuffle=False):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X, y=None, shuffle=False):
         # encoded modified features with tokenizer and added batch size
-        sentences_modified = tf.data.Dataset.from_tensor_slices(
-            (self.sentence, self.y))
+        if y.any():
+            sentences_modified = tf.data.Dataset.from_tensor_slices((X, y))
+        else:
+            sentences_modified = tf.data.Dataset.from_tensor_slices((X))
 
         if shuffle:
-            return self.encode_examples(sentences_modified).shuffle(10000).batch(batch_size)
-        return self.encode_examples(sentences_modified).batch(batch_size)
+            return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
+        return self.encode_examples(sentences_modified).batch(self.batch_size)
 
 
 class Word2VecEncoder(BaseEstimator, TransformerMixin):
