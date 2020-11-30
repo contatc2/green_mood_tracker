@@ -16,7 +16,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
 
-batch_size = 256
+BATCH_SIZE = 32
 max_length = 30
 learning_rate = 7e-5
 epsilon = 1e-8
@@ -51,7 +51,7 @@ class RobertaTrainer(MlFlowTrainer):
         self.ds_test_encoded = None
         self.ds_val_encoded = None
 
-    def sentence_encode_all(self, batch_size=256):
+    def sentence_encode_all(self, batch_size=BATCH_SIZE):
         # How can we use a pipeline here?
         # encoded modified features with tokenizer and added batch size
 
@@ -97,7 +97,7 @@ class RobertaTrainer(MlFlowTrainer):
         # how do we want to pass the number of epochs
         tic = time.time()
         self.build_estimator()
-        self.sentence_encode_all(batch_size=256)
+        self.sentence_encode_all()
         if self.gridsearch:
             self.add_grid_search()
         early_stop = EarlyStopping(

@@ -1,4 +1,4 @@
-from green_mood_tracker.params import BUCKET_NAME, BUCKET_FOLDER, MODEL_NAME, MODEL_VERSION
+from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION
 import pandas as pd
 from google.cloud import storage
 from green_mood_tracker.training_data import get_raw_data
@@ -25,7 +25,7 @@ def get_data(nrows=10000, local=False, binary=True, **kwargs):
         return df
 
 
-def clean(df, column):
+def clean(df, column='text'):
 
     cachedStopWords = stopwords.words("english")
     lemmatizer = WordNetLemmatizer()
@@ -43,6 +43,25 @@ def clean(df, column):
         [word for word in x.split() if word not in cachedStopWords]))
 
     return df
+
+def clean_series(ds):
+
+    cachedStopWords = stopwords.words("english")
+    lemmatizer = WordNetLemmatizer()
+
+    ds = ds.map(lambda x1: " ".join(
+        filter(lambda x2: x2[0] != '@', x1.split())))\
+    .map(lambda x: x.translate(
+        str.maketrans('', '', string.punctuation)))\
+    .map(lambda x: x.translate(
+        str.maketrans('', '', string.digits)))\
+    .map(lambda x: x.lower())\
+    .map(lambda x:
+        [lemmatizer.lemmatize(word) for word in x.split()])\
+    .map(lambda x:
+        [word for word in x if word not in cachedStopWords])
+
+    return ds
 
 
 if __name__ == '__main__':

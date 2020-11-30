@@ -1,24 +1,23 @@
 import os
 import joblib
-import sys
 
 from google.cloud import storage
 from termcolor import colored
 
-from green_mood_tracker.params import BUCKET_NAME, BUCKET_FOLDER, MODEL_NAME, MODEL_VERSION
+from green_mood_tracker.params import BUCKET_NAME, MODELS_FOLDER, MODEL_NAME, MODEL_VERSION
 
 
 
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='model.joblib', rm=False):
 
-    sys.path.insert(0, '../')
-    saved_model_path = 'models/RoBERTa.tf/saved_model.pb'
+    if model_name == 'RoBERTa':
+        saved_model_path = os.path.join('models', 'RoBERTa.tf')
+    else:
+        saved_model_path =  os.path.join('models', model_filename)
     client = storage.Client().bucket(bucket_name)
 
-    BUCKET_FOLDER = 'models'
-
     storage_location = '{}/{}/{}/{}'.format(
-        BUCKET_FOLDER,
+        MODELS_FOLDER,
         model_name,
         model_version,
         model_filename
@@ -30,10 +29,10 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
                   "green"))
     if rm:
         os.remove(saved_model_path)
+        # shutil.rmtree(saved_model_path)
 
 
 def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=False):
-    sys.path.insert(0, '../')
     root = 'raw_data/'
     file_path = root + filename
     client = storage.Client().bucket(bucket)
@@ -50,19 +49,25 @@ def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=Fa
         os.remove(file_path)
 
 
-def download_model(model_version=MODEL_VERSION, bucket=BUCKET_NAME, rm=True):
-    client = storage.Client().bucket(bucket)
-    model_name = 'model.joblib'
+def download_model(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, rm=True):
+    client = storage.Client().bucket(bucket_name)
+    if model_name == 'RoBERTa':
+        model_filename = 'models/RoBERTa.tf/saved_model.pb'
+    else:
+        model_filename = 'word2vec.h5'
+
+    saved_model_path = 'models/' + model_filename
+
     storage_location = '{}/{}/{}/{}'.format(
-        BUCKET_FOLDER,
-        MODEL_NAME,
+        MODELS_FOLDER,
+        model_name,
         model_version,
-        model_name
+        model_filename
     )
     blob = client.blob(storage_location)
-    blob.download_to_filename(model_name)
-    print(f"=> pipeline downloaded from storage")
+    blob.download_to_filename(saved_model_path)
+    print(f"=> {model_filename} downloaded from storage")
     model = joblib.load(model_name)
     if rm:
-        os.remove(model_name)
+        os.remove(saved_model_path)
     return model

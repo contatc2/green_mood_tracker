@@ -1,4 +1,5 @@
 import time
+import matplotlib.pyplot as plt
 
 
 def map_example_to_dict(input_ids, attention_masks, label):
@@ -7,6 +8,23 @@ def map_example_to_dict(input_ids, attention_masks, label):
         "attention_mask": attention_masks,
     }, label
 
+
+def plot_loss(history):
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model loss')
+    plt.ylabel('Mean Square Error - Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'], loc='best')
+    plt.show()
+
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('Model Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'], loc='best')
+    plt.show()
 
 ################
 #  DECORATORS  #

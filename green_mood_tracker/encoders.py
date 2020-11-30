@@ -1,8 +1,14 @@
+import numpy as np
 
 from transformers import RobertaTokenizerFast
 import tensorflow_datasets as tfds
 # from tensorflow.data.Dataset import from_tensor_slices
 from green_mood_tracker.utils import map_example_to_dict
+from green_mood_tracker.data import clean_series
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from sklearn.base import BaseEstimator, TransformerMixin
+
+import gensim.downloader as api
 import tensorflow as tf
 
 MAX_LENGTH = 30
@@ -60,3 +66,29 @@ class RobertaEncoder():
         if shuffle:
             return self.encode_examples(sentences_modified).shuffle(10000).batch(batch_size)
         return self.encode_examples(sentences_modified).batch(batch_size)
+
+
+class Word2VecEncoder(BaseEstimator, TransformerMixin):
+
+    def __init__(self, **kwargs):
+        self.library =kwargs.get('library', "glove-twitter-100")
+        self.vectors = api.load(self.library)
+
+    def embed_sentence(self, sentence):
+        embedded_sentence = []
+        for word in sentence:
+            if word in self.vectors.vocab.keys():
+                vector = self.vectors[word]
+                embedded_sentence.append(vector)
+        return np.array(embedded_sentence)
+
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X, y=None):
+        # Sentences to list of words
+        embedding = []
+        for sentence in clean_series(X):
+            embedded_sentence = self.embed_sentence(sentence)
+            embedding.append(embedded_sentence)
+        return pad_sequences(embedding, dtype='float32', padding='post')
