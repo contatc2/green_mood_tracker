@@ -28,7 +28,7 @@ def get_raw_data(path = 'raw_data/', binary=False):
     twitter_corpus_final['source'] = "twitter_corpus"
     twitter_corpus_final['polarity'] = twitter_corpus_final.polarity.map({'positive':4,'neutral':1,'negative':0})
 
-    complete_data = pd.concat([sts_gold_final,kaggle_sentiment_train_final,kaggle_sentiment_test_final,twitter_corpus_final])
+    complete_data = pd.concat([sts_gold_final,kaggle_sentiment_train_final,kaggle_sentiment_test_final,twitter_corpus_final], ignore_index=True)
     complete_data = complete_data.dropna()
 
     if binary:
