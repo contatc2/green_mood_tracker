@@ -30,6 +30,7 @@ def plot_loss(history):
 #  DECORATORS  #
 ################
 
+
 def simple_time_tracker(method):
     def timed(*args, **kw):
         ts = time.time()

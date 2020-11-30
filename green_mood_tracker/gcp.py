@@ -9,12 +9,7 @@ from green_mood_tracker.params import BUCKET_NAME, MODELS_FOLDER, MODEL_NAME, MO
 
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='model.joblib', rm=False):
 
-    if model_name == 'RoBERTa':
-        saved_model_path = os.path.join('models', 'RoBERTa.tf')
-    else:
-        saved_model_path = os.path.join('models', model_filename)
-
-    client = storage.Client().bucket(bucket_name)
+    saved_model_path = os.path.join('..', 'models', model_filename)
     storage_location = '{}/{}/{}/{}'.format(
         MODELS_FOLDER,
         model_name,
@@ -24,16 +19,16 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
 
     if model_name == 'RoBERTa':
         command = f'gsutil -m cp -R {saved_model_path} gs://{bucket_name}/{storage_location}'
-        os.system(saved_model_path)
+        os.system(command)
     else:
+        client = storage.Client().bucket(bucket_name)
         blob = client.blob(storage_location)
         blob.upload_from_filename(filename=saved_model_path)
 
     print(colored("=> {} uploaded to bucket {} inside {}".format(model_filename, bucket_name, storage_location),
                   "green"))
     if rm:
-        os.remove(saved_model_path)
-        # shutil.rmtree(saved_model_path)
+        os.system(f'rm -r {saved_model_path}')
 
 
 def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=False):
