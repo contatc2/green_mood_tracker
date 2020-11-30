@@ -17,19 +17,18 @@ def get_prediction_data(data_filename):
     Download twint data saved on GCP for prediction
     """
     path = "gs://{}/{}/{}/{}".format(BUCKET_NAME, 'data', 'twint_data', data_filename)
-    df = pd.read_csv(path)
-    return df
+    return pd.read_csv(path)
 
 def get_test_data():
     """
     Download gold standard set
     """
     path = "gs://{}/{}/{}/{}".format(BUCKET_NAME, 'data', 'twint_data', TWINT_TEST_FILE)
-    df = pd.read_csv(path)
-    return df
+    return pd.read_csv(path)
 
 def evaluate_model(y, y_pred):
     accuracy = accuracy_score(y, y_pred)
+    print(colored(f'accuracy is {accuracy}', 'green'))
     return accuracy
 
 
@@ -41,21 +40,15 @@ def generate_prediction(data, model_name=MODEL_NAME, model_version=MODEL_VERSION
     if model_name == 'RoBERTa':
         encoder = RobertaEncoder(BATCH_SIZE)
         X = clean(data).text
-        print(colored(f'X shape {X.shape}', 'red'))
         y = data.index
-        print(colored(f'y shape {y.shape}', 'red'))
         ds_test_encoded = encoder.transform(X,y)
-        print(colored(f'ds shape {ds_test_encoded.element_spec}', 'red'))
-        # y_pred =tf.nn.softmax(model.predict(ds_test_encoded))
-        y_pred = model.predict(ds_test_encoded)
-        print(colored(f'y_pred shape pre reshape {y_pred.shape}', 'red'))
-        y_pred = np.array(y_pred).reshape(len(data))
-        print(colored(f'y_pred shape {y_pred.shape}', 'red'))
+        results =tf.nn.softmax(model.predict(ds_test_encoded))
+        y_pred = np.array(results).reshape((len(data), 2))[:,1]
     else:
         encoder = Word2VecEncoder()
         X = data.text
         y_pred = model.predict(encoder.transform(X))
-    return y_pred.reshape(len(data))
+    return y_pred
 
 def twint_prediction(data_filename, model_name=MODEL_NAME, model_version=MODEL_VERSION, download_files=False):
     data = get_prediction_data(data_filename)
@@ -72,6 +65,7 @@ def evaluate_model_on_gold_standard(model_name=MODEL_NAME, model_version=MODEL_V
     test_df = get_test_data()
     y = test_df.polarity
     y_pred = generate_prediction(test_df, model_name=model_name, model_version=model_version, download_files=download_files)
+    y_pred = pd.Series(y_pred).map(lambda x: 1 if x >= 0.5 else 0)
     return evaluate_model(y, y_pred)
 
 if __name__ == '__main__':
