@@ -44,6 +44,7 @@ class Word2VecTrainer(MlFlowTrainer):
                         self.X_train, self.y_train, test_size=0.3, random_state=0)
 
         self.history = None
+        self.rm = self.kwargs.get("rm", True)
 
     def create_embedding(self):
         # How can we use a pipeline here?
@@ -93,17 +94,20 @@ class Word2VecTrainer(MlFlowTrainer):
         else:
             print(colored("accuracy train: {}".format(accuracy), "blue"))
 
-    def save_model(self, upload=True, auto_remove=True, **kwargs):
+    def save_model(self, upload=True, **kwargs):
         """Save the model and upload it on Google Storage /models folder
         """
         root = 'models'
+        if not os.path.isdir(root):
+            os.mkdir(root)
+
         model_filename = 'word2vec.h5'
-        self.model.save(os.path.join(root,model_filename))
+        self.model.save(os.path.join(root, model_filename))
         print(colored("wor2vec.h5 saved locally", "green"))
 
         if upload:
             storage_upload_models(model_name='word2vec', model_version=MODEL_VERSION,
-                                  model_filename=model_filename, rm=auto_remove)
+                                  model_filename=model_filename, rm=self.rm)
 
 if __name__ == "__main__":
     warnings.simplefilter(action='ignore', category=FutureWarning)
@@ -114,6 +118,7 @@ if __name__ == "__main__":
                   upload=True,
                   local=False,  # set to False to get data from GCP
                   mlflow=True, # set to True to log params to mlflow
+                  rm=False,
                   experiment_name=EXPERIMENT
                   )
 
