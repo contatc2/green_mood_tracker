@@ -109,7 +109,7 @@ class RobertaTrainer(MlFlowTrainer):
         if not os.path.isdir('models'):
             os.system('mkdir models')
 
-        root = 'models/'
+        root = 'models'
         model_filename = 'roBERTa.tf'
         self.model.save_pretrained(os.path.join(root, model_filename))
         print(colored("roBERTa.tf saved locally", "green"))
