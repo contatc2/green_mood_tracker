@@ -62,7 +62,7 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None, shuffle=False):
         # encoded modified features with tokenizer and added batch size
-        if y:
+        if y.any():
             sentences_modified = tf.data.Dataset.from_tensor_slices((X, y))
         else:
             sentences_modified = tf.data.Dataset.from_tensor_slices((X))

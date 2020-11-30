@@ -1,6 +1,7 @@
 import time
 import joblib
 import warnings
+import os
 from termcolor import colored
 
 from green_mood_tracker.data import get_data, clean
@@ -20,7 +21,7 @@ BATCH_SIZE = 32
 max_length = 30
 learning_rate = 7e-5
 epsilon = 1e-8
-number_of_epochs = 3
+number_of_epochs = 1
 patience = 5
 
 
@@ -55,7 +56,7 @@ class RobertaTrainer(MlFlowTrainer):
         # encoded modified features with tokenizer and added batch size
         encoder = RobertaEncoder(batch_size)
 
-        self.ds_train_encoded = encoder.fit_transform(self.sentence_train, self.y_train, shuffle=True)
+        self.ds_train_encoded = encoder.transform(self.sentence_train, self.y_train, shuffle=True)
         if self.split:
             self.ds_test_encoded = encoder.transform(self.sentence_test, self.y_test)
         if self.val_split:
@@ -72,31 +73,12 @@ class RobertaTrainer(MlFlowTrainer):
         model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
         self.model = model
 
-    def add_grid_search(self):
-        """"
-        Apply Gridsearch on self.params defined in get_estimator
-
-        """
-        # Here add randomseearch to your pipeline
-        grid_params = {'rgs__' + k: v for k, v in self.model_params.items()}
-
-        self.model = RandomizedSearchCV(
-            self.model,
-            grid_params,
-            n_iter=20,
-            n_jobs=None,
-            scoring=accuracy,
-            cv=5,
-        )
-
     @simple_time_tracker
     def train(self, number_of_epochs=number_of_epochs):
         # how do we want to pass the number of epochs
         tic = time.time()
         self.build_estimator()
         self.sentence_encode_all()
-        if self.gridsearch:
-            self.add_grid_search()
         early_stop = EarlyStopping(
             patience=patience, restore_best_weights=True, monitor='val_accuracy')
         history = self.model.fit(self.ds_train_encoded, epochs=number_of_epochs,
@@ -116,13 +98,15 @@ class RobertaTrainer(MlFlowTrainer):
         else:
             print(colored("accuracy train: {}".format(accuracy), "blue"))
 
-    def save_model(self, upload=True, auto_remove=True, **kwargs):
+    def save_model(self, upload=True, auto_remove=False, **kwargs):
         """Save the model into a .joblib and upload it on Google Storage /models folder
         HINTS : use sklearn.joblib (or jbolib) libraries and google-cloud-storage"""
 
-        root = '../models/'
+        root = os.path.join('..', 'models')
+        # how do we put stuff in the models folder??? right path?
+        # root = 'models'
         model_filename = 'roBERTa.tf'
-        self.model.save_pretrained(root+model_filename)
+        self.model.save_pretrained(os.path.join(root,model_filename))
         print(colored("roBERTa.tf saved locally", "green"))
 
         if upload:
