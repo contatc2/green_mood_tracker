@@ -7,9 +7,12 @@ from sklearn.cluster import KMeans
 import pandas as pd
 import numpy as np
 import seaborn as sns
-from wordcloud                        import WordCloud
-from data_cleaning import clean
+from wordcloud                        import WordCloud, ImageColorGenerator
+from green_mood_tracker.data_cleaning import clean
 from sklearn.decomposition import LatentDirichletAllocation
+import numpy as np
+from PIL import Image
+import requests
 
 
 def vectorizer(df, column):
@@ -125,25 +128,34 @@ def centroidsDict(df, column, index, n_feats, centroids):
 
     return centroid_dict
 
-def generateWordClouds(df, column, n_feats):
+def generateWordClouds(df, column, n_feats, url = False):
     centroids = Centroids(df, column, n_feats)
-    wordcloud = WordCloud(max_font_size=100, background_color = 'white')
-    for i in range(0, len(centroids)):
+    wordcloud = WordCloud(max_font_size=100, background_color = 'white', mask = mask)
+    if url == False:
+        for i in range(0, len(centroids)):
         centroid_dict = centroidsDict(df, column, i, n_feats, centroids)
         wordcloud.generate_from_frequencies(centroid_dict)
-
         plt.figure()
         plt.title('Cluster {}'.format(i))
         plt.imshow(wordcloud)
         plt.axis("off")
-        plt.show()
+    else:
+        mask = np.array(Image.open(requests.get(url, stream=True).raw))
+        for i in range(0, len(centroids)):
+            centroid_dict = centroidsDict(df, column, i, n_feats, centroids)
+            wordcloud.generate_from_frequencies(centroid_dict)
+            plt.figure()
+            plt.title('Cluster {}'.format(i))
+            plt.imshow(wordcloud)
+            plt.axis("off")
+    plt.show()
 
 
-def get_lda(df, column):
+def get_lda(df, column, n_components, max_iter):
     tf_idf, X = vectorizer(df, column)
-    params = {'n_components': [2, 4, 5, 10, 20, 50],
+    params = {'n_components': n_components,
      'learning_decay': [.5, 0.7, 0.9],
-     'max_iter': [300, 500, 1000]
+     'max_iter': max_iter
      }
     lda = LatentDirichletAllocation()
     lda_search = GridSearchCV(lda, param_grid = params)
@@ -164,8 +176,27 @@ def get_lda(df, column):
 
     return df_topic_keywords
 
+def lda_wordcloud(df, column, n_components, max_iter, url = False):
+    df_topics = get_lda(df, column, n_components, max_iter)
+    dict_topics = df_topics.to_dict('records')
+    if url == False:
+        for i in range(len(dict_topics)):
+            wordcloud = WordCloud(background_color = 'white').generate_from_frequencies(dict_topics[i])
+            plt.figure(figsize=(10,10))
+            plt.imshow(wordcloud, interpolation='bilinear')
+            plt.axis("off")
+    else :
+        mask = np.array(Image.open(requests.get(url, stream=True).raw))
+        for i in range(len(dict_topics)):
+            wordcloud = WordCloud(background_color = 'white', mask = mask).generate_from_frequencies(dict_topics[i])
+            plt.figure(figsize=(10,10))
+            plt.imshow(wordcloud, interpolation='bilinear')
+            plt.axis("off")
+
+    plt.show()
 
 
-=======
+
+
 if __name__ == '__main__':
     main()

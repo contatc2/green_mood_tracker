@@ -14,6 +14,7 @@ class TWINT():
         self.file_path = kwargs.get('file_path', False)
         self.limit = kwargs.get('limit', False)
         self.overwrite = kwargs.get('overwrite', True)
+        self.geo = kwargs.get('geo', False)
 
     def search(self):
         c = twint.Config()
@@ -25,10 +26,11 @@ class TWINT():
         c.Search = self.keywords
         c.Since = self.since
         c.Pandas = True
+        c.Geo = self.geo
         twint.run.Search(c)
 
         Tweets_df = twint.storage.panda.Tweets_df
-        Tweets_df = Tweets_df[Tweets_df['language'] == 'en']
+
         return Tweets_df
 
     def csv(self):
@@ -63,7 +65,6 @@ class TWINT():
             twint.run.Search(c)
 
             Tweets_df = twint.storage.panda.Tweets_df
-            Tweets_df = Tweets_df[Tweets_df['language'] == 'en']
 
             list_df.append(Tweets_df)
 
@@ -85,6 +86,7 @@ class TWINT():
             c.Since = self.since
             c.Hide_output = True
             c.Near = city
+            c.Geo = self.geo
             twint.run.Search(c)
 
         csv = pd.read_csv('./' + self.file_path)
