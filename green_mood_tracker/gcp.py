@@ -11,6 +11,8 @@ from green_mood_tracker.params import BUCKET_NAME, MODELS_FOLDER, MODEL_NAME, MO
 
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='roBERTa.tf', rm=False):
 
+    print(f'Uploading {model_filename}!')
+
     saved_model_path = os.path.join('models', model_filename)
     storage_location = '{}/{}/{}/{}'.format(
         MODELS_FOLDER,
@@ -46,7 +48,8 @@ def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=Fa
     )
     blob = client.blob(storage_location)
     blob.upload_from_filename(filename=data_path)
-    print(colored("=> {} uploaded to bucket {} inside {}".format(filename, BUCKET_NAME, storage_location), "green"))
+    print(colored("=> {} uploaded to bucket {} inside {}".format(
+        filename, BUCKET_NAME, storage_location), "green"))
     if rm:
         os.remove(data_path)
 
@@ -77,7 +80,8 @@ def load_model(model_name=MODEL_NAME, model_filename='roBERTa.tf', rm=False):
     saved_model_path = os.path.join('models', model_filename)
 
     if model_name == 'RoBERTa':
-        model = TFRobertaForSequenceClassification.from_pretrained(saved_model_path)
+        model = TFRobertaForSequenceClassification.from_pretrained(
+            saved_model_path)
     else:
         model = load_model(saved_model_path)
 
