@@ -1,5 +1,5 @@
 
-from transformers import RobertaTokenizer
+from transformers import RobertaTokenizerFast
 import tensorflow_datasets as tfds
 # from tensorflow.data.Dataset import from_tensor_slices
 from green_mood_tracker.utils import map_example_to_dict
@@ -20,7 +20,7 @@ class RobertaEncoder():
     def convert_example_to_feature(self, entry):
         # combine step for tokenization, WordPiece vector mapping
         # add also special tokens and truncate reviews longer than our max length
-        roberta_tokenizer = RobertaTokenizer.from_pretrained("roberta-base")
+        roberta_tokenizer = RobertaTokenizerFast.from_pretrained("roberta-base")
         return roberta_tokenizer.encode_plus(entry,
                                              # add [CLS], [SEP]
                                              add_special_tokens=True,
