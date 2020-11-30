@@ -7,25 +7,28 @@ from termcolor import colored
 from green_mood_tracker.params import BUCKET_NAME, MODELS_FOLDER, MODEL_NAME, MODEL_VERSION
 
 
-
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='model.joblib', rm=False):
 
     if model_name == 'RoBERTa':
         saved_model_path = os.path.join('models', 'RoBERTa.tf')
     else:
-        saved_model_path =  os.path.join('models', model_filename)
-    client = storage.Client().bucket(bucket_name)
+        saved_model_path = os.path.join('models', model_filename)
 
+    client = storage.Client().bucket(bucket_name)
     storage_location = '{}/{}/{}/{}'.format(
         MODELS_FOLDER,
         model_name,
         model_version,
         model_filename
     )
+    if model_name == 'RoBERTa':
+        os.system(
+            command=f'gsutil -m cp -R {saved_model_path} gs://{bucket_name}/{storage_location}')
+    else:
+        blob = client.blob(storage_location)
+        blob.upload_from_filename(filename=saved_model_path)
 
-    blob = client.blob(storage_location)
-    blob.upload_from_filename(filename=saved_model_path)
-    print(colored("=> {} uploaded to bucket {} inside {}".format(model_filename, BUCKET_NAME, storage_location),
+    print(colored("=> {} uploaded to bucket {} inside {}".format(model_filename, bucket_name, storage_location),
                   "green"))
     if rm:
         os.remove(saved_model_path)
@@ -33,8 +36,10 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
 
 
 def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=False):
-    root = 'raw_data/'
-    file_path = root + filename
+
+    data_path = os.path.join(os.path.abspath(
+        os.path.dirname(__file__)), '..', 'raw_data', filename)
+
     client = storage.Client().bucket(bucket)
     storage_location = '{}/{}/{}'.format(
         'data',
@@ -42,11 +47,11 @@ def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=Fa
         filename
     )
     blob = client.blob(storage_location)
-    blob.upload_from_filename(filename=file_path)
+    blob.upload_from_filename(filename=data_path)
     print(colored("=> {} uploaded to bucket {} inside {}".format(filename, BUCKET_NAME, storage_location),
                   "green"))
     if rm:
-        os.remove(file_path)
+        os.remove(data_path)
 
 
 def download_model(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, rm=True):
