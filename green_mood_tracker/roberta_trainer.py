@@ -3,6 +3,7 @@ import joblib
 import warnings
 import os
 from termcolor import colored
+import os
 
 from green_mood_tracker.data import get_data, clean
 from green_mood_tracker.mlflow_trainer import MlFlowTrainer
@@ -38,6 +39,7 @@ class RobertaTrainer(MlFlowTrainer):
         del X, y
         self.split = self.kwargs.get("split", True)
         self.val_split = self.kwargs.get("val_split", True)
+        self.rm = self.kwargs.get("rm", True)
         if self.split:
             self.sentence_train, self.sentence_test, self.y_train, self.y_test =\
                 train_test_split(self.X_train, self.y_train,
@@ -56,11 +58,14 @@ class RobertaTrainer(MlFlowTrainer):
         # encoded modified features with tokenizer and added batch size
         encoder = RobertaEncoder(batch_size)
 
-        self.ds_train_encoded = encoder.transform(self.sentence_train, self.y_train, shuffle=True)
+        self.ds_train_encoded = encoder.transform(
+            self.sentence_train, self.y_train, shuffle=True)
         if self.split:
-            self.ds_test_encoded = encoder.transform(self.sentence_test, self.y_test)
+            self.ds_test_encoded = encoder.transform(
+                self.sentence_test, self.y_test)
         if self.val_split:
-            self.ds_val_encoded = encoder.transform(self.sentence_val, self.y_val)
+            self.ds_val_encoded = encoder.transform(
+                self.sentence_val, self.y_val)
 
     def build_estimator(self, learning_rate=learning_rate, epsilon=1e-08):
         model = TFRobertaForSequenceClassification.from_pretrained(
@@ -98,18 +103,20 @@ class RobertaTrainer(MlFlowTrainer):
         else:
             print(colored("accuracy train: {}".format(accuracy), "blue"))
 
-    def save_model(self, upload=True, auto_remove=False, **kwargs):
+    def save_model(self, upload=True, **kwargs):
         """Save the model into a .joblib and upload it on Google Storage /models folder
         HINTS : use sklearn.joblib (or jbolib) libraries and google-cloud-storage"""
+        if not os.path.isdir('models'):
+            os.system('mkdir models')
 
         root = 'models'
         model_filename = 'roBERTa.tf'
-        self.model.save_pretrained(os.path.join(root,model_filename))
+        self.model.save_pretrained(os.path.join(root, model_filename))
         print(colored("roBERTa.tf saved locally", "green"))
 
         if upload:
             storage_upload_models(model_name='RoBERTa', model_version=MODEL_VERSION,
-                                  model_filename=model_filename, rm=auto_remove)
+                                  model_filename=model_filename, rm=self.rm)
 
 
 if __name__ == "__main__":
