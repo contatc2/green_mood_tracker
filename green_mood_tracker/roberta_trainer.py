@@ -1,9 +1,7 @@
 import time
-import joblib
 import warnings
 import os
 from termcolor import colored
-import os
 
 from green_mood_tracker.data import get_data, clean
 from green_mood_tracker.mlflow_trainer import MlFlowTrainer
