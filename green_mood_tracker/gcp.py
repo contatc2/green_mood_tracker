@@ -21,9 +21,10 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
         model_version,
         model_filename
     )
+
     if model_name == 'RoBERTa':
-        os.system(
-            command=f'gsutil -m cp -R {saved_model_path} gs://{bucket_name}/{storage_location}')
+        command = f'gsutil -m cp -R {saved_model_path} gs://{bucket_name}/{storage_location}'
+        os.system(saved_model_path)
     else:
         blob = client.blob(storage_location)
         blob.upload_from_filename(filename=saved_model_path)
@@ -38,7 +39,7 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
 def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=False):
 
     data_path = os.path.join(os.path.abspath(
-        os.path.dirname(__file__)), '..', 'raw_data', filename)
+        os.path.dirname(__file__)), 'raw_data', filename)
 
     client = storage.Client().bucket(bucket)
     storage_location = '{}/{}/{}'.format(

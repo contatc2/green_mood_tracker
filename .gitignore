@@ -9,7 +9,7 @@ dist/
 groupama/data/base_pno.*
 .DS_Store
 .idea/
-/raw_data/
+green_mood_tracker/raw_data/
 notebooks/download_train-Leonardo.ipynb
 notebooks/contatc2_cloud-test.ipynb
 models/
