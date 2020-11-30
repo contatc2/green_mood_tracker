@@ -4,6 +4,7 @@ from transformers import RobertaTokenizer
 import tensorflow_datasets as tfds
 # from tensorflow.data.Dataset import from_tensor_slices
 from green_mood_tracker.utils import map_example_to_dict
+from green_mood_tracker.data import clean_series
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -69,13 +70,9 @@ class RobertaEncoder():
 
 class Word2VecEncoder(BaseEstimator, TransformerMixin):
 
-    def __init__(self, sentences=None):
-        self.sentences = sentences
-        self.vectors = None
-        self.embedding = []
-
-    def get_word2vec(self):
-        self.vectors = api.load("glove-twitter-100")
+    def __init__(self, **kwargs):
+        self.library =kwargs.get('library', "glove-twitter-100")
+        self.vectors = api.load(self.library)
 
     def embed_sentence(self, sentence):
         embedded_sentence = []
@@ -85,24 +82,13 @@ class Word2VecEncoder(BaseEstimator, TransformerMixin):
                 embedded_sentence.append(vector)
         return np.array(embedded_sentence)
 
-    def embedding_pipeline(self):
-        # Sentences to list of words
-        self.get_word2vec()
-        for sentence in self.sentences.map(lambda x: x.split()):
-            embedded_sentence = self.embed_sentence(sentence)
-            self.embedding.append(embedded_sentence)
-        # Pad the inputs
-        return pad_sequences(self.embedding, dtype='float32', padding='post')
-
     def fit(self, X, y=None):
         return self
 
     def transform(self, X, y=None):
         # Sentences to list of words
-        self.get_word2vec()
-        for sentence in X.map(lambda x: x.split()):
+        embedding = []
+        for sentence in X:
             embedded_sentence = self.embed_sentence(sentence)
-            self.embedding.append(embedded_sentence)
-        # Pad the inputs
-        X = pad_sequences(self.embedding, dtype='float32', padding='post')
-        return X
+            embedding.append(embedded_sentence)
+        return pad_sequences(embedding, dtype='float32', padding='post')
