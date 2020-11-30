@@ -9,8 +9,7 @@ from green_mood_tracker.params import BUCKET_NAME, MODELS_FOLDER, MODEL_NAME, MO
 
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename='model.joblib', rm=False):
 
-    saved_model_path = os.path.join('..', 'models', model_filename)
-    # saved_model_path = os.path.join('models', model_filename)
+    saved_model_path = os.path.join('models', model_filename)
     storage_location = '{}/{}/{}/{}'.format(
         MODELS_FOLDER,
         model_name,
