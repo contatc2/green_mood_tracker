@@ -21,12 +21,12 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
         self.attention_mask_list = []
         self.label_list = []
         self.batch_size = batch_size
+        self.roberta_tokenizer = RobertaTokenizerFast.from_pretrained("roberta-base")
 
     def convert_example_to_feature(self, entry):
         # combine step for tokenization, WordPiece vector mapping
         # add also special tokens and truncate reviews longer than our max length
-        roberta_tokenizer = RobertaTokenizerFast.from_pretrained("roberta-base")
-        return roberta_tokenizer.encode_plus(entry,
+        return self.roberta_tokenizer.encode_plus(entry,
                                              # add [CLS], [SEP]
                                              add_special_tokens=True,
                                              max_length=MAX_LENGTH,  # max length of text that can go to RoBERTa
@@ -62,10 +62,10 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None, shuffle=False):
         # encoded modified features with tokenizer and added batch size
-        if y.any():
-            sentences_modified = tf.data.Dataset.from_tensor_slices((X, y))
+        if y is None:
+            sentences_modified = tf.data.Dataset.from_tensor_slices(X)
         else:
-            sentences_modified = tf.data.Dataset.from_tensor_slices((X))
+            sentences_modified = tf.data.Dataset.from_tensor_slices((X, y))
 
         if shuffle:
             return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
