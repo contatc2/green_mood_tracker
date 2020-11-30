@@ -28,3 +28,4 @@ nltk
 seaborn
 wordcloud
 psutil
+gcsfs

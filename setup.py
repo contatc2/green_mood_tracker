@@ -37,7 +37,8 @@ REQUIRED_PACKAGES = [
       'nltk',
       'seaborn',
       'wordcloud',
-      'psutil'
+      'psutil',
+      'gcsfs'
     ]
 
 setup(name='green_mood_tracker',
