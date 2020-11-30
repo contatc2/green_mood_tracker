@@ -28,7 +28,8 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
     print(colored("=> {} uploaded to bucket {} inside {}".format(model_filename, BUCKET_NAME, storage_location),
                   "green"))
     if rm:
-        shutil.rmtree(saved_model_path)
+        os.remove(saved_model_path)
+        # shutil.rmtree(saved_model_path)
 
 
 def storage_upload_data(filename, folder='twint_data', bucket=BUCKET_NAME, rm=False):

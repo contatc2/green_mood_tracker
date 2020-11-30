@@ -88,7 +88,7 @@ class Word2VecEncoder(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         # Sentences to list of words
         embedding = []
-        for sentence in X:
+        for sentence in clean_series(X):
             embedded_sentence = self.embed_sentence(sentence)
             embedding.append(embedded_sentence)
         return pad_sequences(embedding, dtype='float32', padding='post')
