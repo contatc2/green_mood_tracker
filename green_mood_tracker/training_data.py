@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-def get_raw_data(path = 'raw_data/', binary=False):
+def get_raw_data(path = 'green_mood_tracker/raw_data/', binary=False):
 
     sts_gold = pd.read_csv(path + 'STS_gold.csv',sep=';')
     kaggle_sentiment_train = pd.read_csv(path + 'kaggle_sentiment_train.csv')
@@ -41,7 +41,7 @@ def get_raw_data(path = 'raw_data/', binary=False):
 
 def get_raw_data_notebook(binary=False):
 
-    path = '../raw_data/'
+    path = '../green_mood_tracker/raw_data/'
     return get_raw_data(path, binary)
 
 

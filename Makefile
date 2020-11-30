@@ -58,3 +58,24 @@ pypi_test:
 
 pypi:
 	@twine upload dist/* -u lologibus2
+
+##### Package params  - - - - - - - - - - - - - - - - - - -
+
+PACKAGE_NAME=TaxiFareModel
+FILENAME=trainer
+
+##### Job - - - - - - - - - - - - - - - - - - - - - - - - -
+
+JOB_NAME=green_mood_tracker_$(shell date +'%Y%m%d_%H%M%S')
+
+gcp_submit_training:
+gcloud ai-platform jobs submit training ${JOB_NAME} \
+	--job-dir gs://${BUCKET_NAME}/${BUCKET_TRAINING_FOLDER} \
+	--package-path ${PACKAGE_NAME} \
+	--module-name ${PACKAGE_NAME}.${FILENAME} \
+	--python-version=${PYTHON_VERSION} \
+	--runtime-version=${RUNTIME_VERSION} \
+	--region ${REGION} \
+	--scale-tier CUSTOM \
+	--master-machine-type ${MACHINE_TYPE}
+	--stream-logs
