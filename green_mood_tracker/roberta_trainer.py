@@ -46,8 +46,6 @@ class RobertaTrainer(MlFlowTrainer):
                     train_test_split(
                         self.sentence_train, self.y_train, test_size=0.3, random_state=0)
 
-        self.gridsearch = self.kwargs.get('gridsearch', False)
-
         self.ds_train_encoded = None
         self.ds_test_encoded = None
         self.ds_val_encoded = None
@@ -55,15 +53,13 @@ class RobertaTrainer(MlFlowTrainer):
     def sentence_encode_all(self, batch_size=BATCH_SIZE):
         # How can we use a pipeline here?
         # encoded modified features with tokenizer and added batch size
+        encoder = RobertaEncoder(batch_size)
 
-        self.ds_train_encoded = RobertaEncoder(
-            self.sentence_train, self.y_train).sentence_encode(batch_size, shuffle=True)
+        self.ds_train_encoded = encoder.fit_transform(self.sentence_train, self.y_train, shuffle=True)
         if self.split:
-            self.ds_test_encoded = RobertaEncoder(
-                self.sentence_test, self.y_test).sentence_encode(batch_size)
+            self.ds_test_encoded = encoder.transform(self.sentence_test, self.y_test)
         if self.val_split:
-            self.ds_val_encoded = RobertaEncoder(
-                self.sentence_val, self.y_val).sentence_encode(batch_size)
+            self.ds_val_encoded = encoder.transform(self.sentence_val, self.y_val)
 
     def build_estimator(self, learning_rate=learning_rate, epsilon=1e-08):
         model = TFRobertaForSequenceClassification.from_pretrained(
@@ -115,8 +111,6 @@ class RobertaTrainer(MlFlowTrainer):
         if self.split:
             accuracy_test = self.model.evaluate(self.ds_test_encoded)[1]
             self.mlflow_log_metric("test_accuracy", accuracy_test)
-            if self.gridsearch:
-                self.log_estimator_params()
             print(colored("accuracy train: {} || accuracy test: {}".format(
                 accuracy, accuracy_test), "blue"))
         else:
@@ -134,14 +128,6 @@ class RobertaTrainer(MlFlowTrainer):
         if upload:
             storage_upload_models(model_name='RoBERTa', model_version=MODEL_VERSION,
                                   model_filename=model_filename, rm=auto_remove)
-
-    def log_estimator_params(self):
-        # reg = self.get_estimator()
-        # self.mlflow_log_param('estimator_name', reg.__class__.__name__)
-        # params = reg.get_params()
-        # for k, v in params.items():
-        #     self.mlflow_log_param(k, v)
-        pass
 
 
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ BUCKET_NAME ='green-mood-tracker-01'
 ##### Data  - - - - - - - - - - - - - - - - - - - - - - - -
 
 # train data file location
-
+TWINT_TEST_FILE = 'twint_test_data.csv'
 
 ##### Training  - - - - - - - - - - - - - - - - - - - - - -
 
