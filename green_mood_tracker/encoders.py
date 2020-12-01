@@ -2,8 +2,7 @@ import numpy as np
 
 from transformers import RobertaTokenizerFast
 import tensorflow_datasets as tfds
-# from tensorflow.data.Dataset import from_tensor_slices
-from green_mood_tracker.utils import map_example_to_dict
+# from green_mood_tracker.utils import map_example_to_dict
 from green_mood_tracker.data import clean_series
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -37,11 +36,11 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
                                              )
 
     # map to the expected input to TFRobertaForSequenceClassification, see here
-    # def map_example_to_dict(self, input_ids, attention_masks, label):
-    #     return {
-    #         "input_ids": input_ids,
-    #         "attention_mask": attention_masks,
-    #     }, label
+    def map_example_to_dict(self, input_ids, attention_masks, label):
+        return {
+            "input_ids": input_ids,
+            "attention_mask": attention_masks,
+        }, label
 
     def encode_examples(self, ds, limit=-1):
         # Prepare Input list
@@ -55,7 +54,7 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
             self.label_list.append([label])
 
         return tf.data.Dataset.from_tensor_slices((self.input_ids_list, self.attention_mask_list, self.label_list))\
-            .map(map_example_to_dict)
+            .map(self.map_example_to_dict)
 
     def fit(self, X, y=None):
         return self
