@@ -16,10 +16,10 @@ tensorflow-datasets
 transformers
 tensorflow
 gensim
-google-cloud-storage==1.26.0
-mlflow==1.8.0
-termcolor==1.1.0
-memoized-property==1.0.3
+google-cloud-storage
+mlflow
+termcolor
+memoized-property
 flask==1.1.1
 flask-cors
 gunicorn
