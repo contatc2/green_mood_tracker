@@ -133,12 +133,12 @@ def generateWordClouds(df, column, n_feats, url = False):
     wordcloud = WordCloud(max_font_size=100, background_color = 'white', mask = mask)
     if url == False:
         for i in range(0, len(centroids)):
-        centroid_dict = centroidsDict(df, column, i, n_feats, centroids)
-        wordcloud.generate_from_frequencies(centroid_dict)
-        plt.figure()
-        plt.title('Cluster {}'.format(i))
-        plt.imshow(wordcloud)
-        plt.axis("off")
+            centroid_dict = centroidsDict(df, column, i, n_feats, centroids)
+            wordcloud.generate_from_frequencies(centroid_dict)
+            plt.figure()
+            plt.title('Cluster {}'.format(i))
+            plt.imshow(wordcloud)
+            plt.axis("off")
     else:
         mask = np.array(Image.open(requests.get(url, stream=True).raw))
         for i in range(0, len(centroids)):
