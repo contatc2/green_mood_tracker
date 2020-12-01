@@ -6,7 +6,7 @@ from termcolor import colored
 from green_mood_tracker.data import get_data
 from green_mood_tracker.mlflow_trainer import MlFlowTrainer
 from green_mood_tracker.encoders import Word2VecEncoder
-from green_mood_tracker.params import MODEL_VERSION
+from green_mood_tracker.params import MODEL_VERSION, WORD2VEC_FILENAME, MODELS_FOLDER
 from green_mood_tracker.gcp import storage_upload_models
 from green_mood_tracker.utils import simple_time_tracker
 
@@ -16,9 +16,7 @@ from tensorflow.keras import models, layers
 
 
 BATCH_SIZE = 32
-# learning_rate = 7e-5
-# epsilon = 1e-8
-NUM_OF_EPOCHS = 1
+NUM_OF_EPOCHS = 30
 PATIENCE = 5
 
 
@@ -47,7 +45,6 @@ class Word2VecTrainer(MlFlowTrainer):
         self.rm = self.kwargs.get("rm", True)
 
     def create_embedding(self):
-        # How can we use a pipeline here?
         # encoded modified features with tokenizer and added batch size
         encoder = Word2VecEncoder()
         self.X_train = encoder.fit_transform(self.X_train)
@@ -72,7 +69,6 @@ class Word2VecTrainer(MlFlowTrainer):
 
     @simple_time_tracker
     def train(self):
-        # how do we want to pass the number of epochs
         tic = time.time()
         self.build_estimator()
         self.create_embedding()
@@ -97,13 +93,13 @@ class Word2VecTrainer(MlFlowTrainer):
     def save_model(self, upload=True, **kwargs):
         """Save the model and upload it on Google Storage /models folder
         """
-        root = 'models'
+        root = MODELS_FOLDER
         if not os.path.isdir(root):
             os.mkdir(root)
 
-        model_filename = 'word2vec.h5'
+        model_filename = WORD2VEC_FILENAME
         self.model.save(os.path.join(root, model_filename))
-        print(colored("wor2vec.h5 saved locally", "green"))
+        print(colored(f"{WORD2VEC_FILENAME} saved locally", "green"))
 
         if upload:
             storage_upload_models(model_name='word2vec', model_version=MODEL_VERSION,
@@ -114,7 +110,7 @@ if __name__ == "__main__":
     # Get and clean data
     EXPERIMENT = "[GB] [London] [green_mood_tracker] word2vec"
 
-    params = dict(nrows=100,
+    params = dict(nrows=None,
                   upload=True,
                   local=False,  # set to False to get data from GCP
                   mlflow=True, # set to True to log params to mlflow

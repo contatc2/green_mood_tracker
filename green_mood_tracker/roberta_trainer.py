@@ -6,7 +6,7 @@ from termcolor import colored
 from green_mood_tracker.data import get_data, clean
 from green_mood_tracker.mlflow_trainer import MlFlowTrainer
 from green_mood_tracker.encoders import RobertaEncoder
-from green_mood_tracker.params import MODEL_VERSION
+from green_mood_tracker.params import MODEL_VERSION, MODELS_FOLDER, ROBERTA_FILENAME
 from green_mood_tracker.gcp import storage_upload_models
 from green_mood_tracker.utils import simple_time_tracker
 
@@ -17,11 +17,10 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
 
 BATCH_SIZE = 32
-max_length = 30
-learning_rate = 7e-5
-epsilon = 1e-8
-number_of_epochs = 1
-patience = 5
+LEARNING_RATE = 7e-5
+EPSILON = 1e-8
+NUM_OF_EPOCHS = 30
+PATIENCE = 5
 
 
 class RobertaTrainer(MlFlowTrainer):
@@ -65,7 +64,7 @@ class RobertaTrainer(MlFlowTrainer):
             self.ds_val_encoded = encoder.transform(
                 self.sentence_val, self.y_val)
 
-    def build_estimator(self, learning_rate=learning_rate, epsilon=1e-08):
+    def build_estimator(self, learning_rate=LEARNING_RATE, epsilon=EPSILON):
         model = TFRobertaForSequenceClassification.from_pretrained(
             "roberta-base")
         optimizer = AdamWeightDecay(
@@ -77,14 +76,14 @@ class RobertaTrainer(MlFlowTrainer):
         self.model = model
 
     @simple_time_tracker
-    def train(self, number_of_epochs=number_of_epochs):
+    def train(self, num_of_epochs=NUM_OF_EPOCHS):
         # how do we want to pass the number of epochs
         tic = time.time()
         self.build_estimator()
         self.sentence_encode_all()
         early_stop = EarlyStopping(
-            patience=patience, restore_best_weights=True, monitor='val_accuracy')
-        history = self.model.fit(self.ds_train_encoded, epochs=number_of_epochs,
+            patience=PATIENCE, restore_best_weights=True, monitor='val_accuracy')
+        history = self.model.fit(self.ds_train_encoded, epochs=num_of_epochs,
                                  validation_data=self.ds_val_encoded, callbacks=[early_stop])
         # can we use a validation split here instead?
         self.mlflow_log_metric("train_time", int(time.time() - tic))
@@ -104,13 +103,14 @@ class RobertaTrainer(MlFlowTrainer):
     def save_model(self, upload=True, **kwargs):
         """Save the model into a .joblib and upload it on Google Storage /models folder
         HINTS : use sklearn.joblib (or jbolib) libraries and google-cloud-storage"""
-        if not os.path.isdir('models'):
-            os.system('mkdir models')
 
-        root = 'models'
-        model_filename = 'roBERTa.tf'
+        root = MODELS_FOLDER
+        if not os.path.isdir(root):
+            os.mkdir(root)
+
+        model_filename = ROBERTA_FILENAME
         self.model.save_pretrained(os.path.join(root, model_filename))
-        print(colored("roBERTa.tf saved locally", "green"))
+        print(colored(f"{ROBERTA_FILENAME} saved locally", "green"))
 
         if upload:
             storage_upload_models(model_name='RoBERTa', model_version=MODEL_VERSION,
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     EXPERIMENT = "[GB] [London] [green_mood_tracker] RoBERTa"
 
     params = dict(nrows=100,
-                  upload=True,
+                  upload=False,
                   local=False,
                   mlflow=True,  # set to True to log params to mlflow
                   experiment_name=EXPERIMENT
