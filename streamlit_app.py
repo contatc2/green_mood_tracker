@@ -7,6 +7,7 @@ import streamlit as st
 from green_mood_tracker.clustering import lda_wordcloud
 from green_mood_tracker.datavisstreamlit import all_plotting
 from green_mood_tracker.datavisstreamlit import altair_plot
+from green_mood_tracker.datavisstreamlit import plot_map
 import plotly.graph_objects as go
 
 #from TaxiFareModel.data import get_data
@@ -20,7 +21,8 @@ COLS = ['key',
         'dropoff_latitude',
         'passenger_count']
 
-altair_sent_by_year, altair_like_by_year, layout, data_slider = all_plotting()
+comment_dataframe = pd.read_csv("green_mood_tracker/raw_data/US/solar.csv")
+altair_sent_by_year, altair_like_by_year, layout, data_slider = plot_map(comment_dataframe)
 
 
 st.markdown("# Green Mood Tracker")
@@ -51,13 +53,14 @@ def main(data_slider,layout):
         st.header('TaxiFare Basic Data Visualisation')
         year = st.slider('Year', min_value = 2010, max_value = 2020)
         country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
+        like_prediction = st.selectbox('Sentiment factor', ['Per Tweet', 'Likes Per Tweet'], 1)
         st.markdown('**Graphs**')
-        data = 'green_mood_tracker/raw_data/twint_US.csv'
-        df = pd.read_csv(data)
-        df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
-        df = df[df['year'] == year]
+        #data = 'green_mood_tracker/raw_data/twint_US.csv'
+        #df = pd.read_csv(data)
+        #df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
+        #df = df[df['year'] == year]
         fig = go.Figure(data=data_slider, layout=layout)
-        c = altair_plot(altair_sent_by_year)
+        c = altair_plot(altair_like_by_year)
         st.plotly_chart(fig)
         st.altair_chart(c, use_container_width=True)
 
