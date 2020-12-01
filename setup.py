@@ -46,7 +46,12 @@ setup(name='green_mood_tracker',
       description="Green Mood Tracker",
       install_requires=REQUIRED_PACKAGES,
       packages=find_packages(),
+<<<<<<< HEAD
       test_suite = 'tests',
+=======
+      test_suite='tests',
+      # include_package_data: to install data from MANIFEST.in
+>>>>>>> 4b50447... update
       include_package_data=True,
       scripts=['scripts/green_mood_tracker-run'],
       zip_safe=False)

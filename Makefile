@@ -59,6 +59,18 @@ pypi_test:
 pypi:
 	@twine upload dist/* -u lologibus2
 
+##### Machine configuration - - - - - - - - - - - - - - - -
+
+REGION=europe-west1
+
+PYTHON_VERSION=3.7
+RUNTIME_VERSION=1.15
+
+##### Gcloud storage params  - - - - - - - - - - - - - - - - - - -
+
+BUCKET_NAME ='green-mood-tracker-01'
+BUCKET_TRAINING_FOLDER = 'models/trained_on_gcloud'
+
 ##### Package params  - - - - - - - - - - - - - - - - - - -
 
 PACKAGE_NAME = green_mood_tracker
@@ -84,6 +96,6 @@ gcp_submit_training:
 		--python-version=${PYTHON_VERSION} \
 		--runtime-version=${RUNTIME_VERSION} \
 		--region ${REGION} \
+		--stream-logs
 		--scale-tier CUSTOM \
 		--master-machine-type ${MACHINE_TYPE}
-		--stream-logs
