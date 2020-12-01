@@ -146,26 +146,26 @@ def plot_map( cum_plot_df):
 
 		data_slider.append(data_each_yr)
 
-	steps = []
-	for i in range(len(data_slider)):
-		step = dict(method='restyle',
-					args=['visible', [False] * len(data_slider)],
-					label='Year {}'.format(i + 2010))
-		step['args'][1][i] = True
-		steps.append(step)
+	#steps = []
+	#for i in range(len(data_slider)):
+		#step = dict(method='restyle',
+					#args=['visible', [False] * len(data_slider)],
+					#label='Year {}'.format(i + 2010))
+		#step['args'][1][i] = True
+		#steps.append(step)
 
-	sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
+	#sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
 
 	layout = dict(title ='Percentage positive sentiment towards solar energy by state in the USA since 2010', geo=dict(scope='usa',
 						   projection={'type': 'albers usa'}),
-				  sliders=sliders)
+				  )
 	#print(data_slider)
-	fig = go.Figure(data=data_slider, layout=layout)
+	#fig = go.Figure(data=st_year, layout=layout)
 	return altair_sent_by_year, altair_like_by_year, layout, data_slider
 	#fig.show()
 
-def altair_plot(altair_like_by_year):
-	source =  altair_like_by_year[2]
+def altair_plot_like(altair_like_by_year,year):
+	source =  altair_like_by_year[abs(year-2020)]
 	alt.data_transformers.disable_max_rows()
 	fig_alt = alt.Chart(source).mark_area().encode(
 	x="date:T",
@@ -173,6 +173,19 @@ def altair_plot(altair_like_by_year):
 	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='redyellowgreen')),
 	tooltip = [alt.Tooltip("date:T"),
 			   alt.Tooltip("Percentage of Likes Per Sentiment (%):Q"),
+			   alt.Tooltip("sentiment:N")
+			  ])
+	return fig_alt
+
+def altair_plot_tweet(altair_sent_by_year,year):
+	source =  altair_sent_by_year[abs(year-2020)]
+	alt.data_transformers.disable_max_rows()
+	fig_alt = alt.Chart(source).mark_area().encode(
+	x="date:T",
+	y="Percentage of Sentiment:Q",
+	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='redyellowgreen')),
+	tooltip = [alt.Tooltip("date:T"),
+			   alt.Tooltip("Percentage of Sentiment (%):Q"),
 			   alt.Tooltip("sentiment:N")
 			  ])
 	return fig_alt
