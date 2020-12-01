@@ -1,4 +1,4 @@
-id,text,polarity,polarity-neutral,Annotator,"0=negative, 1=positive"
+id,tweet,polarity,polarity-neutral,Annotator,"0=negative, 1=positive"
 1.33153E+18,"@MikeHudema Yeah, all this green energy is just great!   https://t.co/DXasQuUhHq",1,2,Henry,
 1.33153E+18,"@MikeHudema Yes, so many jobs created by ""green"" energy! This entire crowd of people will earn less than a dollar for a day's toil.  https://t.co/wBucehkEm0",1,2,Henry,
 1.33107E+18,"@TripleDTrader @SqueeggeeArtist Green energy, generally.",1,1,Henry,
