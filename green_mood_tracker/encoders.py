@@ -15,7 +15,7 @@ MAX_LENGTH = 30
 
 class RobertaEncoder(BaseEstimator, TransformerMixin):
 
-    def __init__(self, batch_size):
+    def __init__(self, batch_size=256):
         self.input_ids_list = []
         self.attention_mask_list = []
         self.label_list = []
@@ -63,14 +63,16 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
         # encoded modified features with tokenizer and added batch size
 
         if y is None:
-            sentences_modified = tf.data.Dataset.from_tensor_slices(X)
+            sentences_modified = tf.data.Dataset.from_tensor_slices((X, X.index))
         else:
             sentences_modified = tf.data.Dataset.from_tensor_slices((X, y))
 
 
-        if shuffle:
-            return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
-        return self.encode_examples(sentences_modified).batch(self.batch_size)
+        return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
+
+        # if shuffle:
+        #     return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
+        # return self.encode_examples(sentences_modified).batch(self.batch_size)
 
 
 class Word2VecEncoder(BaseEstimator, TransformerMixin):
