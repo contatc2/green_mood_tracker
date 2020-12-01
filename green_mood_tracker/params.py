@@ -18,4 +18,4 @@ MODELS_FOLDER = 'models'
 MODEL_NAME = 'RoBERTa'
 
 # model version folder name (where the trained model.joblib file will be stored)
-MODEL_VERSION = 'v0'
+MODEL_VERSION = 'v1'

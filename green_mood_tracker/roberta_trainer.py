@@ -20,7 +20,7 @@ BATCH_SIZE = 32
 max_length = 30
 learning_rate = 7e-5
 epsilon = 1e-8
-number_of_epochs = 1
+number_of_epochs = 100
 patience = 5
 
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     # Get and clean data
     EXPERIMENT = "[GB] [London] [green_mood_tracker] RoBERTa"
 
-    params = dict(nrows=100,
+    params = dict(nrows=None,
                   upload=True,
                   local=False,
                   mlflow=True,  # set to True to log params to mlflow
