@@ -1,5 +1,5 @@
 from datetime import datetime
-
+import numpy as np
 import joblib
 import pandas as pd
 import pytz
@@ -44,21 +44,24 @@ def main():
     if analysis == "Data Visualisation":
         st.header("TaxiFare Basic Data Visualisation")
 
-        d = st.date_input("Select TimeFrame", [])
+        year = st.slider('Year', min_value = 2010, max_value = 2020)
+        year = np.datetime64(str(year))
         country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
 
         st.markdown("**Graphs**")
 
-        if country_prediction == 'USA':
-            data = 'green_mood_tracker/raw_data/twint_dataset.csv'
-        else:
-            data = 'raw_data/twint_UK.csv'
-
+        data = 'green_mood_tracker/raw_data/twint_dataset.csv'
         df = pd.read_csv(data)
+        df['date']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce')
+        mask = (df['date'] <= year)
+        df = df.loc[mask]
+        #st.write(d)
+        #st.write(df['date'])
+        #st.write(year.dtype)
+        st.write(df)
 
-
-        lda_wordcloud(df,'tweet', [2, 5, 10, 15], [300, 1000, 2000], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
-        st.pyplot()
+        #lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
+        #st.pyplot()
 
 
     if analysis == "Prediction":
