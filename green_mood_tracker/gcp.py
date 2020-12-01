@@ -14,13 +14,12 @@ def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_
     print(f'Uploading {model_filename}!')
 
     saved_model_path = os.path.join('models', model_filename)
-    storage_location = '{}/{}/{}/{}'.format(
+    storage_location = '{}/{}/{}'.format(
         MODELS_FOLDER,
         model_name,
-        model_version,
-        model_filename
+        model_version
     )
-    
+
     if model_name == 'RoBERTa':
         command = f'gsutil -m cp -R {saved_model_path} gs://{bucket_name}/{storage_location}'
         os.system(command)
