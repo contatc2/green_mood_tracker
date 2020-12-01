@@ -5,6 +5,10 @@ import pandas as pd
 import pytz
 import streamlit as st
 from green_mood_tracker.clustering import lda_wordcloud
+from green_mood_tracker.datavisstreamlit import all_plotting
+from green_mood_tracker.datavisstreamlit import altair_plot
+import plotly.graph_objects as go
+
 #from TaxiFareModel.data import get_data
 #from TaxiFareModel.utils import geocoder_here
 
@@ -15,6 +19,8 @@ COLS = ['key',
         'dropoff_longitude',
         'dropoff_latitude',
         'passenger_count']
+
+altair_sent_by_year, altair_like_by_year, layout, data_slider = all_plotting()
 
 
 st.markdown("# Green Mood Tracker")
@@ -39,26 +45,23 @@ def format_input(pickup, dropoff, passengers=1):
     return formated_input
 
 
-def main():
+def main(data_slider,layout):
     analysis = st.sidebar.selectbox("Select", ["Prediction", "Data Visualisation"])
-    if analysis == "Data Visualisation":
-        st.header("TaxiFare Basic Data Visualisation")
-
+    if analysis == 'Data Visualisation':
+        st.header('TaxiFare Basic Data Visualisation')
         year = st.slider('Year', min_value = 2010, max_value = 2020)
-        year = np.datetime64(str(year))
-        country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
-
-        st.markdown("**Graphs**")
-
-        data = 'green_mood_tracker/raw_data/twint_dataset.csv'
+        country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
+        st.markdown('**Graphs**')
+        data = 'green_mood_tracker/raw_data/twint_US.csv'
         df = pd.read_csv(data)
-        df['date']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce')
-        mask = (df['date'] <= year)
-        df = df.loc[mask]
-        #st.write(d)
-        #st.write(df['date'])
-        #st.write(year.dtype)
-        st.write(df)
+        df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
+        df = df[df['year'] == year]
+        fig = go.Figure(data=data_slider, layout=layout)
+        c = altair_plot(altair_sent_by_year)
+        st.plotly_chart(fig)
+        st.altair_chart(c, use_container_width=True)
+
+        #st.write(df['tweet'])
 
         #lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
         #st.pyplot()
@@ -95,4 +98,4 @@ def main():
 # proc.test_execute()
 if __name__ == "__main__":
     #df = read_data()
-    main()
+    main(data_slider,layout)
