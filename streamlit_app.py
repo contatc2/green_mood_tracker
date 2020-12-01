@@ -6,8 +6,9 @@ import pytz
 import streamlit as st
 from green_mood_tracker.clustering import lda_wordcloud
 from green_mood_tracker.datavisstreamlit import all_plotting
-from green_mood_tracker.datavisstreamlit import altair_plot
+from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tweet
 from green_mood_tracker.datavisstreamlit import plot_map
+import plotly.express as px
 import plotly.graph_objects as go
 
 #from TaxiFareModel.data import get_data
@@ -50,7 +51,7 @@ def format_input(pickup, dropoff, passengers=1):
 def main(data_slider,layout):
     analysis = st.sidebar.selectbox("Select", ["Prediction", "Data Visualisation"])
     if analysis == 'Data Visualisation':
-        st.header('TaxiFare Basic Data Visualisation')
+        st.header('Sentiment')
         year = st.slider('Year', min_value = 2010, max_value = 2020)
         country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
         like_prediction = st.selectbox('Sentiment factor', ['Per Tweet', 'Likes Per Tweet'], 1)
@@ -59,10 +60,16 @@ def main(data_slider,layout):
         #df = pd.read_csv(data)
         #df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
         #df = df[df['year'] == year]
-        fig = go.Figure(data=data_slider, layout=layout)
-        c = altair_plot(altair_like_by_year)
-        st.plotly_chart(fig)
+        fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
+        if like_prediction == 'Per Tweet':
+            c= altair_plot_tweet(altair_sent_by_year,year)
+            fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].tail(3), values='Percentage of Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
+        elif like_prediction == 'Likes Per Tweet':
+            c = altair_plot_like(altair_like_by_year,year)
+            fig_pie = px.pie(altair_like_by_year[abs(year-2020)].tail(3), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
+        st.plotly_chart(fig,use_container_width=True)
         st.altair_chart(c, use_container_width=True)
+        st.plotly_chart(fig_pie)
 
         #st.write(df['tweet'])
 
