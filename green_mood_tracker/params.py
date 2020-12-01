@@ -1,17 +1,17 @@
-### GCP Storage - - - - - - - - - - - - - - - - - - - - - -
+# GCP Storage - - - - - - - - - - - - - - - - - - - - - -
 
-BUCKET_NAME ='green-mood-tracker-01'
+BUCKET_NAME = 'green-mood-tracker-01'
 
-##### Data  - - - - - - - - - - - - - - - - - - - - - - - -
+# Data  - - - - - - - - - - - - - - - - - - - - - - - -
 
 # train data file location
 TWINT_TEST_FILE = 'green_energy_test.csv'
 
-##### Training  - - - - - - - - - - - - - - - - - - - - - -
+# Training  - - - - - - - - - - - - - - - - - - - - - -
 
 # not required here
 
-##### Model - - - - - - - - - - - - - - - - - - - - - - - -
+# Model - - - - - - - - - - - - - - - - - - - - - - - -
 
 MODELS_FOLDER = 'models'
 # model folder name (will contain the folders for all trained model versions)
