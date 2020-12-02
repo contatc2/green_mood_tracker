@@ -182,8 +182,8 @@ def main():
 		country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
 		topic_prediction = st.selectbox("Select Topic", ['Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
 		d3 = st.date_input("Select TimeFrame", [])
-    
-    sl_predict(country_prediction, topic_prediction, d3)
+
+    	# sl_predict(country_prediction, topic_prediction, d3)
 
 
 

@@ -35,6 +35,7 @@ def results(ds_twint_encoded, df_clean):
 
 def comment_dataframe_prep(df_clean, submission_pre):
 	comment_dataframe = df_clean.copy()
+	comment_dataframe['nlikes'] = comment_dataframe['nlikes'].copy() + 1
 	comment_dataframe['prob_neg'] = 0
 	comment_dataframe['prob_pos'] = 0
 	comment_dataframe['prob_neg'] = submission_pre[:,0]
@@ -49,6 +50,7 @@ def comment_dataframe_prep(df_clean, submission_pre):
 
 def cumulative_features(comment_dataframe):
 	cum_plot_df = comment_dataframe.sort_values(by='date')
+	cum_plot_df['nlikes'] = cum_plot_df['nlikes'].copy() + 1
 	cum_plot_df['neg_count'] = (cum_plot_df['label'] == 0).cumsum()
 	cum_plot_df['pos_count'] = (cum_plot_df['label'] == 2).cumsum()
 	cum_plot_df['neut_count'] = (cum_plot_df['label'] == 1).cumsum()
