@@ -2,21 +2,19 @@ import numpy as np
 
 from transformers import RobertaTokenizerFast
 import tensorflow_datasets as tfds
-# from tensorflow.data.Dataset import from_tensor_slices
-from green_mood_tracker.utils import map_example_to_dict
+# from green_mood_tracker.utils import map_example_to_dict
 from green_mood_tracker.data import clean_series
+from green_mood_tracker.params import MAX_LENGTH
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from sklearn.base import BaseEstimator, TransformerMixin
 
 import gensim.downloader as api
 import tensorflow as tf
 
-MAX_LENGTH = 30
-
 
 class RobertaEncoder(BaseEstimator, TransformerMixin):
 
-    def __init__(self, batch_size):
+    def __init__(self, batch_size=256):
         self.input_ids_list = []
         self.attention_mask_list = []
         self.label_list = []
@@ -37,11 +35,11 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
                                              )
 
     # map to the expected input to TFRobertaForSequenceClassification, see here
-    # def map_example_to_dict(self, input_ids, attention_masks, label):
-    #     return {
-    #         "input_ids": input_ids,
-    #         "attention_mask": attention_masks,
-    #     }, label
+    def map_example_to_dict(self, input_ids, attention_masks, label):
+        return {
+            "input_ids": input_ids,
+            "attention_mask": attention_masks,
+        }, label
 
     def encode_examples(self, ds, limit=-1):
         # Prepare Input list
@@ -55,7 +53,7 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
             self.label_list.append([label])
 
         return tf.data.Dataset.from_tensor_slices((self.input_ids_list, self.attention_mask_list, self.label_list))\
-            .map(map_example_to_dict)
+            .map(self.map_example_to_dict)
 
     def fit(self, X, y=None):
         return self
@@ -64,10 +62,9 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
         # encoded modified features with tokenizer and added batch size
 
         if y is None:
-            sentences_modified = tf.data.Dataset.from_tensor_slices(X)
+            sentences_modified = tf.data.Dataset.from_tensor_slices((X, X.index))
         else:
             sentences_modified = tf.data.Dataset.from_tensor_slices((X, y))
-
 
         if shuffle:
             return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)

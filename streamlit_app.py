@@ -1,15 +1,18 @@
-from datetime import datetime
-import numpy as np
-import joblib
-import pandas as pd
-import pytz
-import streamlit as st
 from green_mood_tracker.clustering import lda_wordcloud
+
+import streamlit as st
+import pytz
+import pandas as pd
+import joblib
+import numpy as np
+from datetime import datetime
+
 from green_mood_tracker.datavisstreamlit import all_plotting
 from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tweet
 from green_mood_tracker.datavisstreamlit import plot_map
 import plotly.express as px
 import plotly.graph_objects as go
+
 
 #from TaxiFareModel.data import get_data
 #from TaxiFareModel.utils import geocoder_here
@@ -17,6 +20,7 @@ import plotly.graph_objects as go
 
 st.markdown("# Green Mood Tracker")
 st.markdown("**Energy Sentiment Analysis**")
+
 
 @st.cache
 def read_data():
@@ -110,6 +114,12 @@ def format_input(pickup, dropoff, passengers=1):
 		"key": str(pickup_datetime)}
 	return formated_input
 
+def sl_predict(country_prediction, topic_prediction, d3):
+
+    st.write(type(country_prediction), type(topic_prediction), type(d3))
+    st.write(country_prediction, topic_prediction, d3)
+
+    return None
 
 def main():
 	analysis = st.sidebar.selectbox("Select", ["Prediction", "Data Visualisation"])
@@ -150,6 +160,9 @@ def main():
 		country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
 		topic_prediction = st.selectbox("Select Topic", ['Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
 		d3 = st.date_input("Select TimeFrame", [])
+    
+    sl_predict(country_prediction, topic_prediction, d3)
+
 
 
 		#dropoff_adress = st.text_input("dropoff adress", "434 6th Ave, New York, NY 10011")
@@ -169,8 +182,10 @@ def main():
 		#st.map(data=data)
 
 
+
 # print(colored(proc.sf_query, "blue"))
 # proc.test_execute()
 if __name__ == "__main__":
 	#df = read_data()
 	main()
+

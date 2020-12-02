@@ -62,31 +62,23 @@ pypi:
 ##### Machine configuration - - - - - - - - - - - - - - - -
 
 REGION=europe-west1
-
 PYTHON_VERSION=3.7
-RUNTIME_VERSION=1.15
+RUNTIME_VERSION=2.1
+MACHINE_TYPE=n1-standard-16
 
 ##### Gcloud storage params  - - - - - - - - - - - - - - - - - - -
 
 BUCKET_NAME ='green-mood-tracker-01'
-BUCKET_TRAINING_FOLDER = 'models/trained_on_gcloud'
+BUCKET_TRAINING_FOLDER = 'trainings'
 
 ##### Package params  - - - - - - - - - - - - - - - - - - -
 
 PACKAGE_NAME = green_mood_tracker
 FILENAME = roberta_trainer
-BUCKET_TRAINING_FOLDER = 'trainings'
-BUCKET_NAME ='green-mood-tracker-01'
-REGION=europe-west1
-PYTHON_VERSION=3.7
-# FRAMEWORK=scikit-learn
-RUNTIME_VERSION=2.1
-
-MACHINE_TYPE=n1-standard-16
 
 ##### Job - - - - - - - - - - - - - - - - - - - - - - - - -
 
-JOB_NAME=green_mood_tracker_$(shell date +'%Y%m%d_%H%M%S')
+JOB_NAME=green_mood_tracker_${FILENAME}_$(shell date +'%Y%m%d_%H%M%S')
 
 gcp_submit_training:
 	gcloud ai-platform jobs submit training ${JOB_NAME} \
@@ -96,6 +88,6 @@ gcp_submit_training:
 		--python-version=${PYTHON_VERSION} \
 		--runtime-version=${RUNTIME_VERSION} \
 		--region ${REGION} \
-		--stream-logs
 		--scale-tier CUSTOM \
-		--master-machine-type ${MACHINE_TYPE}
+		--master-machine-type ${MACHINE_TYPE}\
+		--stream-logs
