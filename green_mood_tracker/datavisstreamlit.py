@@ -10,20 +10,20 @@ import plotly as py
 import plotly.graph_objects as go
 import pickle
 from green_mood_tracker.data_cleaning import clean
-model_load = TFRobertaForSequenceClassification.from_pretrained('models/model_roBERTa_test_2')
+model_load = TFRobertaForSequenceClassification.from_pretrained('models/model_roBERTa_test_distil')
 
 
 
 def cleantopic(df,topic="['solar', 'energy']"):
-	
+
 	df_topic = df[df['search'] == topic]
-	
+
 	df_clean = clean(df_topic,'tweet')
-	
+
 	ds_twint_encoded = RobertaEncoder(batch_size=64).transform(df_clean.tweet, df_clean.timezone, shuffle=True)
-	
+
 	return ds_twint_encoded, df_clean
-	
+
 
 
 def results(ds_twint_encoded, df_clean):
@@ -56,7 +56,7 @@ def cumulative_features(comment_dataframe):
 	cum_plot_df['pos-per'] = cum_plot_df.apply(lambda x: (x['pos_count']/(x['neg_count']+x['pos_count']+x['neut_count']))*100, axis=1)
 	cum_plot_df['neut-per'] = cum_plot_df.apply(lambda x: (x['neut_count']/(x['neg_count']+x['pos_count']+x['neut_count']))*100, axis=1)
 	cum_plot_df['sentiment'] = cum_plot_df['label'].map({0:'Negative',1:'Neutral',2:'Positive'})
-	
+
 	cum_plot_df['pos_like_cum'] = (cum_plot_df['label'] == 2)*cum_plot_df['nlikes']
 	cum_plot_df['neg_like_cum'] = (cum_plot_df['label'] == 0)*cum_plot_df['nlikes']
 	cum_plot_df['neut_like_cum'] = (cum_plot_df['label'] == 1)*cum_plot_df['nlikes']
@@ -66,7 +66,7 @@ def cumulative_features(comment_dataframe):
 	cum_plot_df['neg_like-per'] = cum_plot_df.apply(lambda x: (x['neg_like_cum']/(x['neg_like_cum']+x['pos_like_cum']+x['neut_like_cum']))*100 if (x['neg_like_cum']+x['pos_like_cum']+x['neut_like_cum']) != 0 else 0. , axis=1)
 	cum_plot_df['pos_like-per'] = cum_plot_df.apply(lambda x: (x['pos_like_cum']/(x['neg_like_cum']+x['pos_like_cum']+x['neut_like_cum']))*100 if (x['neg_like_cum']+x['pos_like_cum']+x['neut_like_cum']) != 0 else 0. , axis=1)
 	cum_plot_df['neut_like-per'] = cum_plot_df.apply(lambda x: (x['neut_like_cum']/(x['neg_like_cum']+x['pos_like_cum']+x['neut_like_cum']))*100 if (x['neg_like_cum']+x['pos_like_cum']+x['neut_like_cum']) != 0 else 0. , axis=1)
-	
+
 	return cum_plot_df
 
 #cum_plot_df = cumulative_features(comment_dataframe)
@@ -83,7 +83,7 @@ def altair_data(cum_plot_df):
 	neut_like_last = neut_like.tail(1)
 	altrair_like_sum = pd.concat([neg_like_last,pos_like_last,neut_like_last],axis=0)
 	#altrair_like_sum = altrair_like_sum.sort_values(by='date')
-	
+
 	neg = cum_plot_df[['date','neg-per','sentiment','month']].rename(columns={'neg-per':'Percentage of Sentiment'})
 	neg['sentiment'] = 'Negative'
 	neg_last = neg.tail(1)
@@ -95,7 +95,7 @@ def altair_data(cum_plot_df):
 	neut_last = neut.tail(1)
 	altrair_sent_sum = pd.concat([neg_last,pos_last,neut_last],axis=0)
 	#altrair_sent_sum = altrair_sent_sum.sort_values(by='date')
-	
+
 	return altrair_like_sum,  altrair_sent_sum
 
 
@@ -107,30 +107,30 @@ def plot_map( cum_plot_df):
 	# your color-scale
 	scl = [[0.0, '#ffffff'],[0.2, '#b4a8ce'],[0.4, '#8573a9'],
 		   [0.6, '#7159a3'],[0.8, '#5732a1'],[1.0, '#2c0579']] # purples
-	
+
 	data_slider = []
 	altair_sent_by_year = []
 	altair_like_by_year = []
 	for year in cum_plot_df['year'].unique():
-		
+
 		df_segmented_year =  cum_plot_df[(cum_plot_df['year'] == year)]
 		df_segmented_year_cumulative = cumulative_features(df_segmented_year)
 		altrair_sent_final = pd.DataFrame(columns = ['date','Percentage of Sentiment','sentiment','month'])
 		altrair_like_final = pd.DataFrame(columns = ['date','Percentage of Likes Per Sentiment','sentiment','month'])
-		
+
 		for month in df_segmented_year['month'].unique():
-			
+
 			df_segmented_month =  df_segmented_year[(cum_plot_df['month'] == month)]
 			df_segmented_month_cumulative = cumulative_features(df_segmented_month)
 			altrair_like_sum,  altrair_sent_sum = altair_data( df_segmented_month_cumulative)
 			altrair_sent_final = pd.concat([ altrair_sent_final,altrair_sent_sum],axis=0)
 			altrair_like_final = pd.concat([ altrair_like_final,altrair_like_sum],axis=0)
-		
+
 		altrair_sent_final = altrair_sent_final.sort_values(by='month')
 		altrair_like_final = altrair_like_final.sort_values(by='month')
 		altair_sent_by_year.append(altrair_sent_final)
 		altair_like_by_year.append(altrair_like_final)
-		
+
 		df_segmented = df_segmented_year_cumulative.groupby('state_code').last()[['year','pos-per']].reset_index()
 
 		for col in df_segmented.columns:
@@ -141,7 +141,7 @@ def plot_map( cum_plot_df):
 							locations = df_segmented['state_code'],
 							z=df_segmented['pos-per'].astype(float),
 							locationmode='USA-states',
-							colorscale = px.colors.sequential.ice,
+							colorscale = px.colors.sequential.Greens,
 							colorbar= {'title':'Positive sentiment Percentage'})
 
 		data_slider.append(data_each_yr)
@@ -156,7 +156,7 @@ def plot_map( cum_plot_df):
 
 	#sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
 
-	layout = dict(title ='Percentage positive sentiment towards solar energy by state in the USA since 2010', geo=dict(scope='usa',
+	layout = dict(geo=dict(scope='usa',
 						   projection={'type': 'albers usa'}),
 				  )
 	#print(data_slider)

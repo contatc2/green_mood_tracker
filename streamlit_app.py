@@ -12,6 +12,8 @@ from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tw
 from green_mood_tracker.datavisstreamlit import plot_map
 import plotly.express as px
 import plotly.graph_objects as go
+import altair as alt
+
 
 
 #from TaxiFareModel.data import get_data
@@ -66,7 +68,13 @@ def main(data_slider,layout):
         year = st.slider('Year', min_value = 2010, max_value = 2020)
         country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
         like_prediction = st.selectbox('Sentiment factor', ['Per Tweet', 'Likes Per Tweet'], 1)
-        st.markdown('**Graphs**')
+
+
+        st.text(" \n")
+        st.text(" \n")
+        st.text(" \n")
+        st.text(" \n")
+        st.markdown('**Percentage positive sentiment towards solar energy by state in the USA since 2010**')
         #data = 'green_mood_tracker/raw_data/twint_US.csv'
         #df = pd.read_csv(data)
         #df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
@@ -74,10 +82,12 @@ def main(data_slider,layout):
         fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
         if like_prediction == 'Per Tweet':
             c= altair_plot_tweet(altair_sent_by_year,year)
-            fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].tail(3), values='Percentage of Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
+            fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].tail(3), values='Percentage of Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.algae)
+
+
         elif like_prediction == 'Likes Per Tweet':
             c = altair_plot_like(altair_like_by_year,year)
-            fig_pie = px.pie(altair_like_by_year[abs(year-2020)].tail(3), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
+            fig_pie = px.pie(altair_like_by_year[abs(year-2020)].tail(3), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.algae)
         st.plotly_chart(fig,use_container_width=True)
         st.altair_chart(c, use_container_width=True)
         st.plotly_chart(fig_pie)
