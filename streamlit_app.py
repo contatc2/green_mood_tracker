@@ -212,7 +212,6 @@ def sl_predict(country_prediction, topic_prediction, d3):
 
 
 def main():
-<<<<<<< HEAD
 	analysis = st.sidebar.selectbox(
 	    "Select", ["Prediction", "Data Visualisation"])
 	if analysis == 'Data Visualisation':
@@ -295,85 +294,10 @@ def main():
 		# st.write("💸 taxi fare", res[0])
 		# st.map(data=data)
 
-=======
-    analysis = st.sidebar.selectbox(
-        "Select", ["Prediction", "Data Visualisation"])
-    if analysis == 'Data Visualisation':
-        st.header('Sentiment')
-        year = st.slider('Year', min_value=2010, max_value=2020)
-        country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
-        topic_prediction = st.selectbox("Select Topic", [
-                                        'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
-        like_prediction = st.selectbox(
-            'Sentiment factor', ['Per Tweet', 'Likes Per Tweet'], 1)
-        st.markdown('**Graphs**')
-        # data = 'green_mood_tracker/raw_data/twint_US.csv'
-        # df = pd.read_csv(data)
-        # df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
-        # df = df[df['year'] == year]
-        altair_sent_by_year, altair_like_by_year, layout, data_slider = select_data(
-            topic=topic_prediction, country=country_prediction)
-        fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
-        if like_prediction == 'Per Tweet':
-            c = altair_plot_tweet(altair_sent_by_year, year)
-            fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(
-            ), values='Percentage of Sentiment', names='sentiment', color_discrete_sequence=px.colors.sequential.YlGn)
-        elif like_prediction == 'Likes Per Tweet':
-            c = altair_plot_like(altair_like_by_year, year)
-            fig_pie = px.pie(altair_like_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(
-            ), values='Percentage of Likes Per Sentiment', names='sentiment', color_discrete_sequence=px.colors.sequential.YlGn)
-        st.plotly_chart(fig, use_container_width=True)
-        st.altair_chart(c, use_container_width=True)
-        st.plotly_chart(fig_pie)
-
-        # st.write(df['tweet'])
-
-        # lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
-        # st.pyplot()
-
-    if analysis == "Prediction":
-        # pipeline = joblib.load('data/model.joblib')
-        print("loaded model")
-        st.header("Green Mood Tracker Model Predictions")
-        # inputs from user
-        country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
-        topic_prediction = st.selectbox("Select Topic", [
-                                        'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
-        d3 = st.date_input("Select TimeFrame", [])
-
-        sl_predict(country_prediction, topic_prediction, d3)
-
-    # dropoff_adress = st.text_input("dropoff adress", "434 6th Ave, New York, NY 10011")
-    # Get coords from input adresses usung HERE geocoder
-    # pickup_coords = geocoder_here(pickup_adress)
-    # dropoff_coords = geocoder_here(dropoff_adress)
-    # inputs from user
-    # passenger_counts = st.selectbox("# passengers", [1, 2, 3, 4, 5, 6], 1)
-
-    # data = pd.DataFrame([pickup_coords, dropoff_coords])
-    # to_predict = [format_input(pickup=pickup_coords, dropoff=dropoff_coords, passengers=passenger_counts)]
-    # X = pd.DataFrame(to_predict)
-    # res = pipeline.predict(X[COLS])
-    # st.write("💸 taxi fare", res[0])
-    # st.map(data=data)
->>>>>>> 1191736... x
 
 
 
 # print(colored(proc.sf_query, "blue"))
 # proc.test_execute()
 if __name__ == "__main__":
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-	# df = read_data()
-=======
-	# df = read_data()
->>>>>>> d131668... fixed conflict
 	main()
-
-
-=======
-    # df = read_data()
-    main()
->>>>>>> 1191736... x
