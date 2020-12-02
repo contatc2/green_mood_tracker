@@ -3,17 +3,8 @@ import os
 from termcolor import colored
 from tensorflow.keras.models import load_model
 from transformers import TFRobertaForSequenceClassification
+from green_mood_tracker.params import BUCKET_NAME, MODELS_FOLDER, MODEL_NAME, MODEL_VERSION, ROBERTA_FILENAME, ROBERTA_MODEL, WORD2VEC_FILENAME, WOR2VEC_MODEL, TWINT_FOLDER, DATA_FOLDER
 
-from green_mood_tracker.params import BUCKET_NAME,
-                                      MODELS_FOLDER,
-                                      MODEL_NAME,
-                                      MODEL_VERSION,
-                                      ROBERTA_FILENAME,
-                                      ROBERTA_MODEL,
-                                      WORD2VEC_FILENAME,
-                                      WOR2VEC_MODEL,
-                                      TWINT_FOLDER,
-                                      DATA_FOLDER
 
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename=ROBERTA_FILENAME, rm=False):
 
@@ -57,6 +48,7 @@ def storage_upload_data(filename, folder=TWINT_FOLDER, bucket_name=BUCKET_NAME, 
 
     if rm:
         os.remove(data_path)
+
 
 def storage_download_data(filename, folder=TWINT_FOLDER, bucket_name=BUCKET_NAME, import_folder=True):
     data_path = os.path.join(os.path.abspath(
@@ -120,7 +112,11 @@ def load_model(model_name=MODEL_NAME, rm=False):
 
 
 if __name__ == '__main__':
-    storage_download_data('UK', folder=TWINT_FOLDER, bucket_name=BUCKET_NAME, import_folder=True)
-    storage_download_data('US', folder=TWINT_FOLDER, bucket_name=BUCKET_NAME, import_folder=True)
-    download_model_files(bucket_name=BUCKET_NAME, model_name=ROBERTA_MODEL, model_version='v2', model_filename=ROBERTA_FILENAME)
-    download_model_files(bucket_name=BUCKET_NAME, model_name=WOR2VEC_MODEL, model_version='v1', model_filename=WORD2VEC_FILENAME)
+    storage_download_data('UK', folder=TWINT_FOLDER,
+                          bucket_name=BUCKET_NAME, import_folder=True)
+    storage_download_data('US', folder=TWINT_FOLDER,
+                          bucket_name=BUCKET_NAME, import_folder=True)
+    download_model_files(bucket_name=BUCKET_NAME, model_name=ROBERTA_MODEL,
+                         model_version='v2', model_filename=ROBERTA_FILENAME)
+    download_model_files(bucket_name=BUCKET_NAME, model_name=WOR2VEC_MODEL,
+                         model_version='v1', model_filename=WORD2VEC_FILENAME)
