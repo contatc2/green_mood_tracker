@@ -1,15 +1,18 @@
-from datetime import datetime
-import numpy as np
-import joblib
-import pandas as pd
-import pytz
-import streamlit as st
 from green_mood_tracker.clustering import lda_wordcloud
+
+import streamlit as st
+import pytz
+import pandas as pd
+import joblib
+import numpy as np
+from datetime import datetime
+
 from green_mood_tracker.datavisstreamlit import all_plotting
 from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tweet
 from green_mood_tracker.datavisstreamlit import plot_map
 import plotly.express as px
 import plotly.graph_objects as go
+
 
 #from TaxiFareModel.data import get_data
 #from TaxiFareModel.utils import geocoder_here
@@ -29,6 +32,7 @@ altair_sent_by_year, altair_like_by_year, layout, data_slider = plot_map(comment
 st.markdown("# Green Mood Tracker")
 st.markdown("**Energy Sentiment Analysis**")
 
+
 @st.cache
 def read_data():
     df = pd.read_csv('twint_dataset.csv')
@@ -36,7 +40,8 @@ def read_data():
 
 
 def format_input(pickup, dropoff, passengers=1):
-    pickup_datetime = datetime.utcnow().replace(tzinfo=pytz.timezone('America/New_York'))
+    pickup_datetime = datetime.utcnow().replace(
+        tzinfo=pytz.timezone('America/New_York'))
     formated_input = {
         "pickup_latitude": pickup["latitude"],
         "pickup_longitude": pickup["longitude"],
@@ -47,6 +52,12 @@ def format_input(pickup, dropoff, passengers=1):
         "key": str(pickup_datetime)}
     return formated_input
 
+def sl_predict(country_prediction, topic_prediction, d3):
+
+    st.write(type(country_prediction), type(topic_prediction), type(d3))
+    st.write(country_prediction, topic_prediction, d3)
+
+    return None
 
 def main(data_slider,layout):
     analysis = st.sidebar.selectbox("Select", ["Prediction", "Data Visualisation"])
@@ -73,35 +84,34 @@ def main(data_slider,layout):
 
         #st.write(df['tweet'])
 
-        #lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
-        #st.pyplot()
-
+        # lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
+        # st.pyplot()
 
     if analysis == "Prediction":
-        #pipeline = joblib.load('data/model.joblib')
+        # pipeline = joblib.load('data/model.joblib')
         print("loaded model")
         st.header("Green Mood Tracker Model Predictions")
         # inputs from user
         country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
-        topic_prediction = st.selectbox("Select Topic", ['Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
+        topic_prediction = st.selectbox("Select Topic", [
+                                        'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
         d3 = st.date_input("Select TimeFrame", [])
 
+        sl_predict(country_prediction, topic_prediction, d3)
 
-        #dropoff_adress = st.text_input("dropoff adress", "434 6th Ave, New York, NY 10011")
+        # dropoff_adress = st.text_input("dropoff adress", "434 6th Ave, New York, NY 10011")
         # Get coords from input adresses usung HERE geocoder
-        #pickup_coords = geocoder_here(pickup_adress)
-        #dropoff_coords = geocoder_here(dropoff_adress)
+        # pickup_coords = geocoder_here(pickup_adress)
+        # dropoff_coords = geocoder_here(dropoff_adress)
         # inputs from user
-        #passenger_counts = st.selectbox("# passengers", [1, 2, 3, 4, 5, 6], 1)
+        # passenger_counts = st.selectbox("# passengers", [1, 2, 3, 4, 5, 6], 1)
 
-
-
-        #data = pd.DataFrame([pickup_coords, dropoff_coords])
-        #to_predict = [format_input(pickup=pickup_coords, dropoff=dropoff_coords, passengers=passenger_counts)]
-        #X = pd.DataFrame(to_predict)
-        #res = pipeline.predict(X[COLS])
-        #st.write("💸 taxi fare", res[0])
-        #st.map(data=data)
+        # data = pd.DataFrame([pickup_coords, dropoff_coords])
+        # to_predict = [format_input(pickup=pickup_coords, dropoff=dropoff_coords, passengers=passenger_counts)]
+        # X = pd.DataFrame(to_predict)
+        # res = pipeline.predict(X[COLS])
+        # st.write("💸 taxi fare", res[0])
+        # st.map(data=data)
 
 
 # print(colored(proc.sf_query, "blue"))

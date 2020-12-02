@@ -125,7 +125,8 @@ if __name__ == "__main__":
     # Get and clean data
     EXPERIMENT = "[GB] [London] [green_mood_tracker] RoBERTa"
 
-    params = dict(nrows=100,
+
+    params = dict(nrows=None,
                   upload=False,
                   local=False,
                   mlflow=True,  # set to True to log params to mlflow
