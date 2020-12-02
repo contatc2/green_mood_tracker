@@ -10,7 +10,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import gensim.downloader as api
 import tensorflow as tf
 
-MAX_LENGTH = 30
+MAX_LENGTH = 50
 
 
 class RobertaEncoder(BaseEstimator, TransformerMixin):

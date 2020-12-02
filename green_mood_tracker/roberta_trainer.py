@@ -17,11 +17,14 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.metrics import SparseCategoricalAccuracy
 
 BATCH_SIZE = 32
-LEARNING_RATE = 7e-5
-EPSILON = 1e-8
 NUM_OF_EPOCHS = 30
 PATIENCE = 5
 
+LEARNING_RATE = 1e-05
+EPSILON = 1e-08
+BETA = 0.9
+DECAY = 0.001
+ROBERTA_BASE = 'distilroberta-base'
 
 class RobertaTrainer(MlFlowTrainer):
 
@@ -64,11 +67,11 @@ class RobertaTrainer(MlFlowTrainer):
             self.ds_val_encoded = encoder.transform(
                 self.sentence_val, self.y_val)
 
-    def build_estimator(self, learning_rate=LEARNING_RATE, epsilon=EPSILON):
+    def build_estimator(self):
         model = TFRobertaForSequenceClassification.from_pretrained(
-            "roberta-base")
+            ROBERTA_BASE)
         optimizer = AdamWeightDecay(
-            learning_rate=learning_rate, epsilon=epsilon, weight_decay_rate=0)
+            learning_rate=LEARNING_RATE, epsilon=EPSILON, weight_decay_rate=DECAY, beta_1=BETA)
         # we do not have one-hot vectors, we can use sparce categorical cross entropy and accuracy
         loss = SparseCategoricalCrossentropy(from_logits=True)
         metric = SparseCategoricalAccuracy('accuracy')
@@ -76,14 +79,14 @@ class RobertaTrainer(MlFlowTrainer):
         self.model = model
 
     @simple_time_tracker
-    def train(self, num_of_epochs=NUM_OF_EPOCHS):
+    def train(self):
         # how do we want to pass the number of epochs
         tic = time.time()
         self.build_estimator()
         self.sentence_encode_all()
         early_stop = EarlyStopping(
             patience=PATIENCE, restore_best_weights=True, monitor='val_accuracy')
-        history = self.model.fit(self.ds_train_encoded, epochs=num_of_epochs,
+        history = self.model.fit(self.ds_train_encoded, epochs=NUM_OF_EPOCHS,
                                  validation_data=self.ds_val_encoded, callbacks=[early_stop])
         # can we use a validation split here instead?
         self.mlflow_log_metric("train_time", int(time.time() - tic))
