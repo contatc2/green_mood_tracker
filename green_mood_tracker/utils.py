@@ -2,13 +2,6 @@ import time
 import matplotlib.pyplot as plt
 
 
-def map_example_to_dict(input_ids, attention_masks, label):
-    return {
-        "input_ids": input_ids,
-        "attention_mask": attention_masks,
-    }, label
-
-
 def plot_loss(history):
     plt.plot(history.history['loss'])
     plt.plot(history.history['val_loss'])
