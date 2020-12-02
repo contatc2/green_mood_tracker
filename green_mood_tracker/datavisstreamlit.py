@@ -108,7 +108,7 @@ def altair_data(cum_plot_df):
 	return altrair_like_sum,  altrair_sent_sum
 
 
-def plot_map( cum_plot_df):
+def plot_map(cum_plot_df):
 	cum_plot_df['year'] = pd.DatetimeIndex(cum_plot_df['date']).year
 	cum_plot_df['month'] = pd.DatetimeIndex(cum_plot_df['date']).month
 
@@ -150,7 +150,7 @@ def plot_map( cum_plot_df):
 							locations = df_segmented['state_code'],
 							z=df_segmented['polarity_av'].astype(float),
 							locationmode='USA-states',
-							colorscale = px.colors.sequential.algae,
+							colorscale = px.colors.sequential.Greens,
 							colorbar= {'title':'Positive sentiment Percentage'})
 
 		data_slider.append(data_each_yr)
@@ -165,7 +165,7 @@ def plot_map( cum_plot_df):
 
 	#sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
 
-	layout = dict(title ='Percentage positive sentiment towards solar energy by state in the USA since 2010', geo=dict(scope='usa',
+	layout = dict(geo=dict(scope='usa',
 						   projection={'type': 'albers usa'}),
 				  )
 	#print(data_slider)
@@ -179,7 +179,7 @@ def altair_plot_like(altair_like_by_year,year):
 	fig_alt = alt.Chart(source).mark_area().encode(
 	x="date:T",
 	y="Percentage of Likes Per Sentiment:Q",
-	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='redyellowgreen')),
+	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
 	tooltip = [alt.Tooltip("date:T"),
 			   alt.Tooltip("Percentage of Likes Per Sentiment:Q"),
 			   alt.Tooltip("sentiment:N")
@@ -192,12 +192,36 @@ def altair_plot_tweet(altair_sent_by_year,year):
 	fig_alt = alt.Chart(source).mark_area().encode(
 	x="date:T",
 	y="Percentage of Sentiment:Q",
-	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='redyellowgreen')),
+	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
 	tooltip = [alt.Tooltip("date:T"),
 			   alt.Tooltip("Percentage of Sentiment:Q"),
 			   alt.Tooltip("sentiment:N")
 			  ])
 	return fig_alt
+
+
+
+#def altair_pie_tweet(altair_sent_by_year,year):
+
+#	source =  altair_sent_by_year[abs(year-2020)]
+#	alt.data_transformers.disable_max_rows()
+#fig_pie = px.pie(source,
+	#values='Percentage of Likes Per Sentiment', names='sentiment',
+	#color_discrete_sequence=px.colors.sequential.algae)
+
+#	colors = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen']
+
+#	fig_pie = go.Figure(data=[go.Pie(data =source).mark_area().encode(
+#	x="date:T",
+#	y="Percentage of Sentiment:Q",
+#	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
+#	tooltip = [alt.Tooltip("Date:T"),
+#			   alt.Tooltip("Percentage of Sentiment (%):Q"),
+#			   alt.Tooltip("Sentiment:N")
+#			  ])])
+#fig_pie.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
+	                 #marker=dict(colors=colors, line=dict(color='#000000', width=2))
+#	return fig_pie
 
 def all_plotting(topic="['solar', 'energy']"):
 
