@@ -1,10 +1,18 @@
 from green_mood_tracker.clustering import lda_wordcloud
+
 import streamlit as st
 import pytz
 import pandas as pd
 import joblib
 import numpy as np
 from datetime import datetime
+
+from green_mood_tracker.datavisstreamlit import all_plotting
+from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tweet
+from green_mood_tracker.datavisstreamlit import plot_map
+import plotly.express as px
+import plotly.graph_objects as go
+
 
 #from TaxiFareModel.data import get_data
 #from TaxiFareModel.utils import geocoder_here
@@ -16,6 +24,9 @@ COLS = ['key',
         'dropoff_longitude',
         'dropoff_latitude',
         'passenger_count']
+
+comment_dataframe = pd.read_csv("green_mood_tracker/raw_data/US/solar.csv")
+altair_sent_by_year, altair_like_by_year, layout, data_slider = plot_map(comment_dataframe)
 
 
 st.markdown("# Green Mood Tracker")
@@ -41,7 +52,6 @@ def format_input(pickup, dropoff, passengers=1):
         "key": str(pickup_datetime)}
     return formated_input
 
-
 def sl_predict(country_prediction, topic_prediction, d3):
 
     st.write(type(country_prediction), type(topic_prediction), type(d3))
@@ -49,29 +59,30 @@ def sl_predict(country_prediction, topic_prediction, d3):
 
     return None
 
+def main(data_slider,layout):
+    analysis = st.sidebar.selectbox("Select", ["Prediction", "Data Visualisation"])
+    if analysis == 'Data Visualisation':
+        st.header('Sentiment')
+        year = st.slider('Year', min_value = 2010, max_value = 2020)
+        country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
+        like_prediction = st.selectbox('Sentiment factor', ['Per Tweet', 'Likes Per Tweet'], 1)
+        st.markdown('**Graphs**')
+        #data = 'green_mood_tracker/raw_data/twint_US.csv'
+        #df = pd.read_csv(data)
+        #df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
+        #df = df[df['year'] == year]
+        fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
+        if like_prediction == 'Per Tweet':
+            c= altair_plot_tweet(altair_sent_by_year,year)
+            fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].tail(3), values='Percentage of Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
+        elif like_prediction == 'Likes Per Tweet':
+            c = altair_plot_like(altair_like_by_year,year)
+            fig_pie = px.pie(altair_like_by_year[abs(year-2020)].tail(3), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
+        st.plotly_chart(fig,use_container_width=True)
+        st.altair_chart(c, use_container_width=True)
+        st.plotly_chart(fig_pie)
 
-def main():
-    analysis = st.sidebar.selectbox(
-        "Select", ["Prediction", "Data Visualisation"])
-    if analysis == "Data Visualisation":
-        st.header("TaxiFare Basic Data Visualisation")
-
-        year = st.slider('Year', min_value=2010, max_value=2020)
-        year = np.datetime64(str(year))
-        country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
-
-        st.markdown("**Graphs**")
-
-        data = 'green_mood_tracker/raw_data/twint_dataset.csv'
-        df = pd.read_csv(data)
-        df['date'] = pd.to_datetime(
-            df['date'], format='%Y-%m-%d %H:%M:%S', errors='coerce')
-        mask = (df['date'] <= year)
-        df = df.loc[mask]
-        # st.write(d)
-        # st.write(df['date'])
-        # st.write(year.dtype)
-        st.write(df)
+        #st.write(df['tweet'])
 
         # lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
         # st.pyplot()
@@ -106,5 +117,5 @@ def main():
 # print(colored(proc.sf_query, "blue"))
 # proc.test_execute()
 if __name__ == "__main__":
-    # df = read_data()
-    main()
+    #df = read_data()
+    main(data_slider,layout)
