@@ -29,3 +29,13 @@ seaborn
 wordcloud
 psutil
 gcsfs
+pickle
+joblib
+streamlit
+pytz
+datetime
+altair
+plotly
+vega-datasets
+
+

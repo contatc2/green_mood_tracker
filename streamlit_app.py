@@ -68,28 +68,38 @@ def main(data_slider,layout):
         year = st.slider('Year', min_value = 2010, max_value = 2020)
         country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
         like_prediction = st.selectbox('Sentiment factor', ['Per Tweet', 'Likes Per Tweet'], 1)
-
-
+        topic_selection = st.selectbox("Select Topic", ['Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
         st.text(" \n")
         st.text(" \n")
         st.text(" \n")
         st.text(" \n")
-        st.markdown('**Percentage positive sentiment towards solar energy by state in the USA since 2010**')
+        st.markdown(f'**Percentage Positive Sentiment Towards {topic_selection} by State in the {country_prediction} since 2010**')
         #data = 'green_mood_tracker/raw_data/twint_US.csv'
         #df = pd.read_csv(data)
         #df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
         #df = df[df['year'] == year]
         fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
+        colors = ['darkgreen','darkseagreen', 'darkolivegreen']
+
         if like_prediction == 'Per Tweet':
             c= altair_plot_tweet(altair_sent_by_year,year)
-            fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].tail(3), values='Percentage of Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.algae)
-
-
+            fig_pie = px.pie(altair_sent_by_year[abs(year-2020)], values = 'Percentage of Sentiment', names='sentiment', color_discrete_sequence=px.colors.sequential.algae)
+            fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color = '#000000',
+                  marker=dict(colors=colors, line=dict(color='#000000', width=1.5)))
         elif like_prediction == 'Likes Per Tweet':
             c = altair_plot_like(altair_like_by_year,year)
-            fig_pie = px.pie(altair_like_by_year[abs(year-2020)].tail(3), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.algae)
+            fig_pie = px.pie(altair_like_by_year[abs(year-2020)], values='Percentage of Likes Per Sentiment', names='sentiment', color_discrete_sequence=px.colors.sequential.algae)
+            fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color = '#000000',
+                  marker=dict(colors=colors, line=dict(color='#000000', width=1.5)))
+
         st.plotly_chart(fig,use_container_width=True)
+
+        st.text(" \n")
+        st.markdown('**Evolution of Sentiment Share Over Time**')
         st.altair_chart(c, use_container_width=True)
+
+        st.text(" \n")
+        st.markdown('**Share of Each Sentiment**')
         st.plotly_chart(fig_pie)
 
         #st.write(df['tweet'])
