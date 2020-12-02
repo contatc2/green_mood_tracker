@@ -21,8 +21,8 @@ ROBERTA_FILENAME = 'roBERTa.tf'
 WORD2VEC_FILENAME = 'word2vec.h5'
 
 # model version folder name (where the trained model.joblib file will be stored)
-MODEL_VERSION = 'v0'
 
+MODEL_VERSION = 'v0'
 
 # model params
 MAX_LENGTH = 50
