@@ -7,21 +7,21 @@ from termcolor import colored
 from green_mood_tracker.gcp import download_model_files, load_model
 from green_mood_tracker.data import clean
 from green_mood_tracker.encoders import RobertaEncoder, Word2VecEncoder
-from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, TWINT_TEST_FILE, MAX_LENGTH
+from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, TWINT_TEST_FILE, MAX_LENGTH, DATA_FOLDER, TWINT_FOLDER, ROBERTA_MODEL
 from sklearn.metrics import accuracy_score, f1_score
 from green_mood_tracker.utils import simple_time_tracker
 import tensorflow as tf
 
 
-def get_twint_data(data_filename, local = True):
+def get_twint_data(data_filename, local = True, folder='raw_data'):
     """
     Download twint data saved on GCP for prediction
     """
     if local:
-        path = os.path.join('green_mood_tracker', 'data', data_filename)
+        path = os.path.join('green_mood_tracker', folder, data_filename)
     else:
         path = "gs://{}/{}/{}/{}".format(BUCKET_NAME,
-                                     'data', 'twint_data', data_filename)
+                                     DATA_FOLDER, TWINT_FOLDER, data_filename)
     return pd.read_csv(path)
 
 def evaluate_model(y, y_pred):
@@ -36,7 +36,7 @@ def remove_csv_extension(csv_file):
 @simple_time_tracker
 def encode_data(data, data_filename, model_name=MODEL_NAME):
     tic = time.time()
-    if model_name == 'RoBERTa':
+    if model_name == ROBERTA_MODEL:
         encoder = RobertaEncoder()
         X = clean(data, 'tweet').tweet
         y = data.index
@@ -65,7 +65,7 @@ def get_encoded_data(data_filename):
 def generate_prediction(data_filename, model, model_name=MODEL_NAME, binary=True):
     ds_encoded = get_encoded_data(data_filename)
     tic = time.time()
-    if model_name == 'RoBERTa':
+    if model_name == ROBERTA_MODEL:
         results = np.array(tf.nn.softmax(model.predict(ds_encoded).logits))
         y_pred = np.squeeze(results)[:, 1]
     else:

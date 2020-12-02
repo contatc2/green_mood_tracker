@@ -6,7 +6,7 @@ from termcolor import colored
 from green_mood_tracker.data import get_data
 from green_mood_tracker.mlflow_trainer import MlFlowTrainer
 from green_mood_tracker.encoders import Word2VecEncoder
-from green_mood_tracker.params import MODEL_VERSION, WORD2VEC_FILENAME, MODELS_FOLDER
+from green_mood_tracker.params import MODEL_VERSION, WORD2VEC_FILENAME, MODELS_FOLDER, WOR2VEC_MODEL
 from green_mood_tracker.gcp import storage_upload_models
 from green_mood_tracker.utils import simple_time_tracker
 
@@ -102,7 +102,7 @@ class Word2VecTrainer(MlFlowTrainer):
         print(colored(f"{WORD2VEC_FILENAME} saved locally", "green"))
 
         if upload:
-            storage_upload_models(model_name='word2vec', model_version=MODEL_VERSION,
+            storage_upload_models(model_name=WOR2VEC_MODEL, model_version=MODEL_VERSION,
                                   model_filename=model_filename, rm=self.rm)
 
 if __name__ == "__main__":
