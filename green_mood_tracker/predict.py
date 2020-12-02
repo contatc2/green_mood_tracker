@@ -7,12 +7,10 @@ from termcolor import colored
 from green_mood_tracker.gcp import download_model_files, load_model
 from green_mood_tracker.data import clean
 from green_mood_tracker.encoders import RobertaEncoder, Word2VecEncoder
-from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, TWINT_TEST_FILE
+from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, TWINT_TEST_FILE, MAX_LENGTH
 from sklearn.metrics import accuracy_score, f1_score
 from green_mood_tracker.utils import simple_time_tracker
 import tensorflow as tf
-
-BATCH_SIZE = 32
 
 
 def get_twint_data(data_filename, local = True):
@@ -33,7 +31,7 @@ def evaluate_model(y, y_pred):
     return accuracy, f1
 
 def remove_csv_extension(csv_file):
-    csv_file.replace(".csv", "")
+    return csv_file.replace(".csv", "")
 
 @simple_time_tracker
 def encode_data(data, data_filename, model_name=MODEL_NAME):
@@ -54,8 +52,8 @@ def encode_data(data, data_filename, model_name=MODEL_NAME):
 @simple_time_tracker
 def get_encoded_data(data_filename):
     tic = time.time()
-    element_spec = ({'input_ids': tf.TensorSpec(shape=(None, 30), dtype=tf.int32, name=None),
-                     'attention_mask': tf.TensorSpec(shape=(None, 30), dtype=tf.int32, name=None)},
+    element_spec = ({'input_ids': tf.TensorSpec(shape=(None, MAX_LENGTH), dtype=tf.int32, name=None),
+                     'attention_mask': tf.TensorSpec(shape=(None, MAX_LENGTH), dtype=tf.int32, name=None)},
                       tf.TensorSpec(shape=(None, 1), dtype=tf.int32, name=None))
     path = os.path.join('green_mood_tracker', 'raw_data')
     ds_filename = f'{remove_csv_extension(data_filename)}_encoded'
@@ -68,7 +66,7 @@ def generate_prediction(data_filename, model, model_name=MODEL_NAME, binary=True
     ds_encoded = get_encoded_data(data_filename)
     tic = time.time()
     if model_name == 'RoBERTa':
-        results = np.array(tf.nn.softmax(model.predict(ds_encoded)))
+        results = np.array(tf.nn.softmax(model.predict(ds_encoded).logits))
         y_pred = np.squeeze(results)[:, 1]
     else:
         y_pred = model.predict(ds_encoded)
@@ -112,7 +110,7 @@ def evaluate_model_on_gold_standard(model_name=MODEL_NAME, model_version=MODEL_V
     if binary:
         y_true = test_df.polarity
     else:
-        y_true = test_df.polarity-neutral
+        y_true = test_df['polarity-neutral']
     if download_gcp:
         download_model_files(model_name=model_name,
                              model_version=model_version)
@@ -123,7 +121,8 @@ def evaluate_model_on_gold_standard(model_name=MODEL_NAME, model_version=MODEL_V
 
 if __name__ == '__main__':
     evaluate_model_on_gold_standard(
-        model_name=MODEL_NAME, model_version=MODEL_VERSION)
+        model_name=MODEL_NAME, model_version='v2',
+        download_gcp=False, encode=True, binary=True)
     # data_filename = 'city.csv'
     # data = get_twint_data(data_filename, local=True)
     # encode_data(data, data_filename, model_name=MODEL_NAME)
