@@ -138,6 +138,7 @@ def select_prediction_data(topic='Solar Energy', country='USA', time='(datetime.
         if topic == 'Climate Change':
             pd.read_csv(
                 "green_mood_tracker/raw_data/US/[_climate_, _change_].csv")
+
             return "green_mood_tracker/raw_data/US/[_climate_, _change_].csv"
 
         elif topic == 'Energy Prices':
