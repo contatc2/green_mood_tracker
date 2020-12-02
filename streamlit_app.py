@@ -253,7 +253,7 @@ def sl_predict(country_prediction, topic_prediction, d3):
     select_prediction_data(topic='Solar Energy', country='USA',
                            time='(datetime.date(2010, 12, 2), datetime.date(2030, 12, 2))')
 
-    pred = twint_prediction('UK/[_climate_, _change_].csv')
+    # pred = twint_prediction('UK/[_climate_, _change_].csv')
 
     st.write(pred)
 

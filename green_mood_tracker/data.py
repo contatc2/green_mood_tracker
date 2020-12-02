@@ -1,13 +1,14 @@
+from green_mood_tracker.training_data import get_raw_data
+from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, UK_LIST, US_LIST
 import pandas as pd
 import string
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk import download
+from green_mood_tracker.twint_class import TWINT
 download('wordnet')
 download('stopwords')
 download('punkt')
-from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION
-from green_mood_tracker.training_data import get_raw_data
 
 
 def get_data(nrows=10000, local=False, binary=True, **kwargs):
@@ -59,6 +60,24 @@ def clean_series(ds):
              [word for word in x if word not in cachedStopWords])
 
     return ds
+
+
+def get_twint_data(filepath, Topic, date):
+
+    kwargs = dict(
+        keywords=['solar', 'energy'],
+        cities=cities_list,
+        since='2010-01-01 12:00:00',
+        store_csv=False,
+        limit=200000
+    )
+
+    t = TWINT(**kwargs)
+    df_solar = t.city_df()
+
+    df_solar = df_solar[date[0] < df_solar['date'] < date[1]]
+
+    df_solar.to_csv(filepath)
 
 
 if __name__ == '__main__':
