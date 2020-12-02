@@ -78,11 +78,13 @@ def load_model(model_name=MODEL_NAME, rm=False):
     root = MODELS_FOLDER
 
     if model_name == ROBERTA_MODEL:
-        saved_model_path = os.path.join(root, ROBERTA_FILENAME)
+        model_filename = ROBERTA_FILENAME
+        saved_model_path = os.path.join(root, model_filename)
         model = TFRobertaForSequenceClassification.from_pretrained(
             saved_model_path)
     else:
-        saved_model_path = os.path.join(root, WORD2VEC_FILENAME)
+        model_filename = WORD2VEC_FILENAME
+        saved_model_path = os.path.join(root, model_filename)
         model = load_model(saved_model_path)
 
     print(colored(f"=> loaded model {model_filename}", 'green'))
