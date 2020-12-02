@@ -3,17 +3,7 @@ import os
 from termcolor import colored
 from tensorflow.keras.models import load_model
 from transformers import TFRobertaForSequenceClassification
-
-from green_mood_tracker.params import BUCKET_NAME,
-MODELS_FOLDER,
-MODEL_NAME,
-MODEL_VERSION,
-ROBERTA_FILENAME,
-ROBERTA_MODEL,
-WORD2VEC_FILENAME,
-WOR2VEC_MODEL,
-TWINT_FOLDER,
-DATA_FOLDER
+from green_mood_tracker.params import BUCKET_NAME, MODELS_FOLDER, MODEL_NAME, MODEL_VERSION, ROBERTA_FILENAME, ROBERTA_MODEL, WORD2VEC_FILENAME, WOR2VEC_MODEL, TWINT_FOLDER, DATA_FOLDER
 
 
 def storage_upload_models(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_version=MODEL_VERSION, model_filename=ROBERTA_FILENAME, rm=False):
