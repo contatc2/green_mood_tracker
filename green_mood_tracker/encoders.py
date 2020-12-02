@@ -67,12 +67,9 @@ class RobertaEncoder(BaseEstimator, TransformerMixin):
         else:
             sentences_modified = tf.data.Dataset.from_tensor_slices((X, y))
 
-
-        return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
-
-        # if shuffle:
-        #     return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
-        # return self.encode_examples(sentences_modified).batch(self.batch_size)
+        if shuffle:
+            return self.encode_examples(sentences_modified).shuffle(10000).batch(self.batch_size)
+        return self.encode_examples(sentences_modified).batch(self.batch_size)
 
 
 class Word2VecEncoder(BaseEstimator, TransformerMixin):
