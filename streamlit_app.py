@@ -42,6 +42,14 @@ def format_input(pickup, dropoff, passengers=1):
     return formated_input
 
 
+def sl_predict(country_prediction, topic_prediction, d3):
+
+    st.write(type(country_prediction), type(topic_prediction), type(d3))
+    st.write(country_prediction, topic_prediction, d3)
+
+    return None
+
+
 def main():
     analysis = st.sidebar.selectbox(
         "Select", ["Prediction", "Data Visualisation"])
@@ -65,11 +73,11 @@ def main():
         # st.write(year.dtype)
         st.write(df)
 
-        #lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
+        # lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
         # st.pyplot()
 
     if analysis == "Prediction":
-        #pipeline = joblib.load('data/model.joblib')
+        # pipeline = joblib.load('data/model.joblib')
         print("loaded model")
         st.header("Green Mood Tracker Model Predictions")
         # inputs from user
@@ -78,23 +86,25 @@ def main():
                                         'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
         d3 = st.date_input("Select TimeFrame", [])
 
-        #dropoff_adress = st.text_input("dropoff adress", "434 6th Ave, New York, NY 10011")
+        sl_predict(country_prediction, topic_prediction, d3)
+
+        # dropoff_adress = st.text_input("dropoff adress", "434 6th Ave, New York, NY 10011")
         # Get coords from input adresses usung HERE geocoder
-        #pickup_coords = geocoder_here(pickup_adress)
-        #dropoff_coords = geocoder_here(dropoff_adress)
+        # pickup_coords = geocoder_here(pickup_adress)
+        # dropoff_coords = geocoder_here(dropoff_adress)
         # inputs from user
         # passenger_counts = st.selectbox("# passengers", [1, 2, 3, 4, 5, 6], 1)
 
-        #data = pd.DataFrame([pickup_coords, dropoff_coords])
-        #to_predict = [format_input(pickup=pickup_coords, dropoff=dropoff_coords, passengers=passenger_counts)]
-        #X = pd.DataFrame(to_predict)
-        #res = pipeline.predict(X[COLS])
-        #st.write("💸 taxi fare", res[0])
+        # data = pd.DataFrame([pickup_coords, dropoff_coords])
+        # to_predict = [format_input(pickup=pickup_coords, dropoff=dropoff_coords, passengers=passenger_counts)]
+        # X = pd.DataFrame(to_predict)
+        # res = pipeline.predict(X[COLS])
+        # st.write("💸 taxi fare", res[0])
         # st.map(data=data)
 
 
 # print(colored(proc.sf_query, "blue"))
 # proc.test_execute()
 if __name__ == "__main__":
-    #df = read_data()
+    # df = read_data()
     main()
