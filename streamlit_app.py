@@ -12,6 +12,8 @@ from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tw
 from green_mood_tracker.datavisstreamlit import plot_map
 import plotly.express as px
 import plotly.graph_objects as go
+import altair as alt
+
 
 
 #from TaxiFareModel.data import get_data
@@ -129,22 +131,42 @@ def main():
 		country_prediction = st.selectbox('Select Country', ['UK', 'USA'], 1)
 		topic_prediction = st.selectbox("Select Topic", ['Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
 		like_prediction = st.selectbox('Sentiment factor', ['Per Tweet', 'Likes Per Tweet'], 1)
-		st.markdown('**Graphs**')
+    st.text(" \n")
+    st.text(" \n")
+    st.text(" \n")
+    st.text(" \n")
+    st.markdown(f'**Percentage of Positive Sentiment Towards {topic_prediction} by State in the {country_prediction} since 2010**')
+
 		#data = 'green_mood_tracker/raw_data/twint_US.csv'
 		#df = pd.read_csv(data)
 		#df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
 		#df = df[df['year'] == year]
 		altair_sent_by_year, altair_like_by_year, layout, data_slider = select_data(topic=topic_prediction,country=country_prediction)
 		fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
+    colors = ['darkgreen','darkseagreen', 'darkolivegreen']
+
+    
 		if like_prediction == 'Per Tweet':
 			c= altair_plot_tweet(altair_sent_by_year,year)
 			fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(), values='Percentage of Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
-		elif like_prediction == 'Likes Per Tweet':
+		  fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color = '#000000',
+                  marker=dict(colors=colors, line=dict(color='#000000', width=1.5)))
+    elif like_prediction == 'Likes Per Tweet':
 			c = altair_plot_like(altair_like_by_year,year)
 			fig_pie = px.pie(altair_like_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
-		st.plotly_chart(fig,use_container_width=True)
-		st.altair_chart(c, use_container_width=True)
-		st.plotly_chart(fig_pie)
+		  fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color = '#000000',
+                  marker=dict(colors=colors, line=dict(color='#000000', width=1.5)))
+    
+    st.plotly_chart(fig,use_container_width=True)
+
+    st.text(" \n")
+    st.markdown('**Evolution of Sentiment Share Over Time**')
+    st.altair_chart(c, use_container_width=True)
+
+    st.text(" \n")
+    st.markdown('**Share of Each Sentiment**')
+    st.plotly_chart(fig_pie)
+    
 
 		#st.write(df['tweet'])
 
@@ -183,9 +205,12 @@ def main():
 
 
 
+
 # print(colored(proc.sf_query, "blue"))
 # proc.test_execute()
 if __name__ == "__main__":
+
 	#df = read_data()
 	main()
+
 
