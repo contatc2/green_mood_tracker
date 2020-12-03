@@ -31,9 +31,6 @@ def read_data():
 
 
 @st.cache
-<< << << < HEAD
-
-
 def select_data(topic='Solar Energy', country='USA'):
     if country == 'USA':
         if topic == 'Climate Change':
