@@ -19,7 +19,7 @@ MODELS_FOLDER = 'models'
 # model folder name (will contain the folders for all trained model versions)
 MODEL_NAME = 'RoBERTa'
 ROBERTA_MODEL = 'RoBERTa'
-ROBERTA_FILENAME = 'roBERTa.tf'
+ROBERTA_FILENAME = 'model_roBERTa_test_distil'
 WOR2VEC_MODEL = 'word2vec'
 WORD2VEC_FILENAME = 'word2vec.h5'
 
