@@ -30,15 +30,18 @@ REQUIRED_PACKAGES = [
       'mlflow',
       'termcolor',
       'memoized-property',
-      'flask==1.1.1',
-      'flask-cors',
-      'gunicorn',
       'matplotlib',
       'nltk',
       'seaborn',
       'wordcloud',
       'psutil',
-      'gcsfs'
+      'gcsfs',
+      'streamlit',
+      'pytz',
+      'datetime,'
+      'altair',
+      'plotly',
+      'vega-datasets'
     ]
 
 setup(name='green_mood_tracker',

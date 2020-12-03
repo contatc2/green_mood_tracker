@@ -1,7 +1,4 @@
-from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION
 import pandas as pd
-from google.cloud import storage
-from green_mood_tracker.training_data import get_raw_data
 import string
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -9,17 +6,15 @@ from nltk import download
 download('wordnet')
 download('stopwords')
 download('punkt')
+from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION
+from green_mood_tracker.training_data import get_raw_data
 
 
 def get_data(nrows=10000, local=False, binary=True, **kwargs):
     """method to get the training data (or a portion of it) from google cloud bucket"""
-    # Add Client() here
-    client = storage.Client()
     if local:
         return get_raw_data('raw_data/', binary)
     else:
-        # binary or not
-        # which data source do we want to keep?
         path = "gs://{}/{}/{}/{}".format(BUCKET_NAME,
                                          'data', 'training_data', 'data_binary.csv')
         df = pd.read_csv(path, nrows=nrows)
