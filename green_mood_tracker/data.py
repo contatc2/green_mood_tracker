@@ -70,7 +70,8 @@ def get_twint_data(filepath, country, topic, since, until):
     if country == 'USA':
         cities_list = USA_LIST
     elif country == 'UK':
-        cities_list = UK_LIST
+        # cities_list = UK_LIST
+        cities_list = ['London']
 
     kwargs = dict(
         keywords=topic.lower().split(),
