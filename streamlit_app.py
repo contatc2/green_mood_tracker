@@ -279,13 +279,14 @@ def sl_predict(country_prediction, topic_prediction, date):
     st.write(type(date))
     st.write(date)
 
-    filepath = 'green_mood_tracker/raw_data/twint_test/uktest.csv'
+    filepath = 'twint_test/uk-data-test.csv'
 
-    get_twint_data(filepath, country='UK', topic='Solar Energy',
+    get_twint_data(filepath, country=country_prediction, topic=topic_prediction,
                    since=date[0], until=date[1])
 
-    # pred = twint_prediction(filepath)
-    # st.write(pred)
+    pred = twint_prediction(filepath, encode=True)
+
+    st.write(pred.head())
 
     return None
 
