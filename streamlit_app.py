@@ -45,11 +45,16 @@ def sl_predict(country_prediction, topic_prediction, date):
     labels = 'Positive', 'Negative'
     sizes = [class_1, class_2]
 
-    fig1, ax1 = plt.subplots()
-    ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
-            shadow=True, startangle=90)
-    # Equal aspect ratio ensures that pie is drawn as a circle.
-    ax1.axis('equal')
+    # fig1, ax1 = plt.subplots()
+    fig_1 = px.pie(values=sizes, names=labels, color_discrete_sequence=px.colors.sequential.YlGn)
+    fig_1.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color='#000000',
+                                  marker=dict(colors=['#008000', '#ff0000'], line=dict(color='#000000', width=1.5)))
+
+
+    # ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
+    #         shadow=True, startangle=90)
+    # # Equal aspect ratio ensures that pie is drawn as a circle.
+    # ax1.axis('equal')
 
     # with open('style.css') as f:
     #     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
@@ -65,7 +70,8 @@ def sl_predict(country_prediction, topic_prediction, date):
                 f"<h4 style=color:red;> {pred.iloc[k]['tweet']}</h4>", unsafe_allow_html=True)
         # st.write('Negative' if not pred.iloc[k]['polarity'] else 'Positive')
         st.write('')
-    st.pyplot(fig1)
+
+    st.plotly_chart(fig_1, use_container_width=True)
 
     wc = lda_wordcloud(pred, 'tweet')
 
@@ -221,7 +227,7 @@ def get_twint_path(topic='Solar Energy', country='USA', time='(datetime.date(201
 
 def main():
     analysis = st.sidebar.selectbox(
-        "Select", ["Prediction", "Data Visualisation"])
+        "Select", ["Live Analysis", "Data Visualisation"])
     if analysis == 'Data Visualisation':
         st.header('Sentiment')
         year = st.slider('Year', min_value=2010, max_value=2020)
@@ -282,7 +288,7 @@ def main():
             f'**Total Share of Each Sentiment Towards {topic_prediction} in the {country_prediction} in {year} **')
         st.plotly_chart(fig_pie, use_container_width=True)
 
-    if analysis == "Prediction":
+    if analysis == "Live Analysis":
         st.header("Green Mood Tracker Model Predictions")
         # inputs from user
         country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
