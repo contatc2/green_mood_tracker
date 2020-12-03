@@ -263,7 +263,6 @@ def altair_plot_like(altair_like_by_year,year):
 			   alt.Tooltip("sentiment:N")
 
 			  ])
-	fig_alt.properties(width=2000)
 	return fig_alt
 
 def altair_plot_tweet(altair_sent_by_year,year):
@@ -277,7 +276,6 @@ def altair_plot_tweet(altair_sent_by_year,year):
 			   alt.Tooltip("Percentage of Sentiment:Q"),
 			   alt.Tooltip("sentiment:N")
 			  ])
-	fig_alt.properties(width=2000)
 	return fig_alt
 
 #domain=['Negative', 'Neutral', 'Positive'],range=['#800000', '#FFA500', '#008000']
