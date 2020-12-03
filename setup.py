@@ -32,6 +32,7 @@ REQUIRED_PACKAGES = [
     'memoized-property',
     'matplotlib',
     'nltk',
+    'geojson_rewind',
     'seaborn',
     'wordcloud',
     'psutil',

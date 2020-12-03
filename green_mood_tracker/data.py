@@ -87,7 +87,7 @@ def get_twint_data(filepath, country, topic, since, until):
         lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
     df = df[(since < df['date'])
             & (df['date'] < until)]
-
+    filepath = 'green_mood_tracker/raw_data/' + filepath
     path = Path(filepath)
 
     if(not os.path.isdir(str(path.parent))):
