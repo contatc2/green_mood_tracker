@@ -126,11 +126,6 @@ def select_data(topic='Solar Energy', country='USA'):
             return altair_sent_by_year_UK_wind, altair_like_by_year_UK_wind, figs_UK_wind
 
 
-# @st.cache
-# def select_data(topic='Solar Energy', country='USA'):
-== == == =
-
-
 def select_data(topic='Solar Energy', country='USA'):
     if country == 'USA':
         if topic == 'Climate Change':
