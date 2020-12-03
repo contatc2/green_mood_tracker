@@ -155,9 +155,11 @@ def plot_map(cum_plot_df, country='US',like_prediction = 'Per Tweet'):
 	if like_prediction == 'Per Tweet':
 		zmin = -1
 		zmax = 1
+		colorbar = {'title':'Sentiment Polarity Rating'}
 	elif like_prediction == 'Likes Per Tweet':
-		zmin = -2
-		zmax = 2
+		zmin = -10
+		zmax = 10
+		colorbar = {'title':'Sentiment Popularity Polarity Rating'}
 
 	if country == "UK":
 		with open('green_mood_tracker/raw_data/uk_regions.geojson') as f:
@@ -208,7 +210,7 @@ def plot_map(cum_plot_df, country='US',like_prediction = 'Per Tweet'):
 								colorscale = scl,
 								zmin=zmin,
 								zmax=zmax,
-								colorbar= {'title':'Sentiment Polarity Rating'})
+								colorbar= colorbar)
 
 			data_slider.append(data_each_yr)
 		elif country == 'UK':
@@ -220,7 +222,7 @@ def plot_map(cum_plot_df, country='US',like_prediction = 'Per Tweet'):
                     colorscale = scl,
                     zmin=zmin,
                     zmax=zmax,
-                    colorbar= {'title':'Sentiment Polarity Rating'})
+                    colorbar= colorbar)
 			data_slider.append(data_each_yr)
 	#steps = []
 	#for i in range(len(data_slider)):
@@ -255,11 +257,13 @@ def altair_plot_like(altair_like_by_year,year):
 	fig_alt = alt.Chart(source).mark_area().encode(
 	x="date:T",
 	y="Percentage of Likes Per Sentiment:Q",
-	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
+	color=alt.Color("sentiment:N", scale=alt.Scale(domain=['Negative', 'Neutral', 'Positive'],range=['#ff0000', '#FFA500', '#008000'])),
 	tooltip = [alt.Tooltip("date:T"),
 			   alt.Tooltip("Percentage of Likes Per Sentiment:Q"),
 			   alt.Tooltip("sentiment:N")
+
 			  ])
+	fig_alt.properties(width=2000)
 	return fig_alt
 
 def altair_plot_tweet(altair_sent_by_year,year):
@@ -268,39 +272,17 @@ def altair_plot_tweet(altair_sent_by_year,year):
 	fig_alt = alt.Chart(source).mark_area().encode(
 	x="date:T",
 	y="Percentage of Sentiment:Q",
-	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
+	color=alt.Color("sentiment:N", scale=alt.Scale(domain=['Negative', 'Neutral', 'Positive'],range=['#ff0000', '#FFA500', '#008000'])),
 	tooltip = [alt.Tooltip("date:T"),
 			   alt.Tooltip("Percentage of Sentiment:Q"),
 			   alt.Tooltip("sentiment:N")
 			  ])
+	fig_alt.properties(width=2000)
 	return fig_alt
 
+#domain=['Negative', 'Neutral', 'Positive'],range=['#800000', '#FFA500', '#008000']
 
 
-#def altair_pie_tweet(altair_sent_by_year,year):
-
-
-#	source =  altair_sent_by_year[abs(year-2020)]
-#	alt.data_transformers.disable_max_rows()
-# fig_pie = px.pie(source,
-    # values='Percentage of Likes Per Sentiment', names='sentiment',
-    # color_discrete_sequence=px.colors.sequential.algae)
-
-
-#	colors = ['gold', 'mediumturquoise', 'darkorange', 'lightgreen']
-
-
-#	fig_pie = go.Figure(data=[go.Pie(data =source).mark_area().encode(
-#	x="date:T",
-#	y="Percentage of Sentiment:Q",
-#	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
-#	tooltip = [alt.Tooltip("Date:T"),
-#			   alt.Tooltip("Percentage of Sentiment (%):Q"),
-#			   alt.Tooltip("Sentiment:N")
-#			  ])])
-# fig_pie.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
-    # marker=dict(colors=colors, line=dict(color='#000000', width=2))
-#	return fig_pie
 def all_plotting(topic="['solar', 'energy']"):
     us_twint = pd.read_csv('green_mood_tracker/raw_data/twint_US.csv',
                            dtype={"date": "string", "tweet": "string"})
