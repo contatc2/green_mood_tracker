@@ -14,9 +14,8 @@ from geojson_rewind import rewind
 import json
 
 
-model_load = TFRobertaForSequenceClassification.from_pretrained(
-    'models/model_roBERTa.tf')
-
+# model_load = TFRobertaForSequenceClassification.from_pretrained(
+#     'models/roBERTa.tf')
 
 def cleantopic(df, topic="['solar', 'energy']"):
 

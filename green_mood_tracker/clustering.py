@@ -164,19 +164,20 @@ def get_lda(df, column, n_components, max_iter):
               'learning_decay': [.5, 0.7, 0.9],
               'max_iter': max_iter
               }
-    lda = LatentDirichletAllocation()
-    lda_search = GridSearchCV(lda, param_grid=params)
-    lda_search.fit(X)
+    lda = LatentDirichletAllocation(n_components=n_components, max_iter=max_iter)
+    # lda_search = GridSearchCV(lda, param_grid=params)
+    # lda_search.fit(X)
+    lda.fit(X)
     # Best Model
-    best_lda_model = lda_search.best_estimator_
-    # Model Parameters
-    params = lda_search.best_params_
+    # best_lda_model = lda_search.best_estimator_
+    # # Model Parameters
+    # params = lda_search.best_params_
     # Log Likelihood Score
-    score = lda_search.best_score_
+    # score = lda_search.best_score_
     # Perplexity
-    perplexity = best_lda_model.perplexity(tf_idf)
+    # perplexity = best_lda_model.perplexity(tf_idf)
 
-    df_topic_keywords = pd.DataFrame(best_lda_model.components_)
+    df_topic_keywords = pd.DataFrame(lda.components_)
     df_topic_keywords.columns = tf_idf.columns
     topicnames = ["Topic " + str(i)
                   for i in range(df_topic_keywords.index[-1]+1)]
@@ -185,14 +186,14 @@ def get_lda(df, column, n_components, max_iter):
     return df_topic_keywords
 
 
-def lda_wordcloud(df, column, n_components, max_iter, url=False):
-    df_topics = get_lda(df, column, n_components, max_iter)
+def lda_wordcloud(df, column, n_components=[3], max_iter=[1000], url=False):
+    df_topics = get_lda(df, column, n_components[0], max_iter[0])
     dict_topics = df_topics.to_dict('records')
     if url == False:
         for i in range(len(dict_topics)):
             wordcloud = WordCloud(
                 background_color='white').generate_from_frequencies(dict_topics[i])
-            plt.figure(figsize=(10, 10))
+            fig = plt.figure(figsize=(10, 10))
             plt.imshow(wordcloud, interpolation='bilinear')
             plt.axis("off")
     else:
@@ -200,11 +201,12 @@ def lda_wordcloud(df, column, n_components, max_iter, url=False):
         for i in range(len(dict_topics)):
             wordcloud = WordCloud(
                 background_color='white', mask=mask).generate_from_frequencies(dict_topics[i])
-            plt.figure(figsize=(10, 10))
+            fig = plt.figure(figsize=(10, 10))
             plt.imshow(wordcloud, interpolation='bilinear')
             plt.axis("off")
 
     plt.show()
+    return fig
 
 
 if __name__ == '__main__':

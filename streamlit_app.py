@@ -1,30 +1,32 @@
-from green_mood_tracker.clustering import lda_wordcloud
 
-from green_mood_tracker.predict import twint_prediction
-from green_mood_tracker.utils import simple_time_tracker
-from green_mood_tracker.data import get_twint_data
-
+import pytz
 import streamlit as st
 import streamlit.components.v1 as components
 import matplotlib.pyplot as plt
-import pytz
 import pandas as pd
-import joblib
-import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+import altair as alt
 from datetime import datetime
 from termcolor import colored
 from green_mood_tracker.datavisstreamlit import all_plotting
 from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tweet
 from green_mood_tracker.datavisstreamlit import plot_map
-import plotly.express as px
-import plotly.graph_objects as go
-import altair as alt
+from green_mood_tracker.clustering import lda_wordcloud
+from green_mood_tracker.predict import twint_prediction
+from green_mood_tracker.utils import simple_time_tracker
+from green_mood_tracker.data import get_twint_data
 
+
+<<<<<<< HEAD
 
 st.set_page_config(layout='wide')
 
 
 img = st.image('green_mood_tracker/raw_data/green_mood_tracker_logo.png',
+=======
+img = st.image('green_mood_tracker/assets/green_mood_tracker_logo.png',
+>>>>>>> 48814f7... added wordcloud
                style='left', width=700, output_format='png')
 
 st.markdown("**Energy Sentiment Analysis**")
@@ -71,7 +73,14 @@ def sl_predict(country_prediction, topic_prediction, date):
         st.write('')
     st.pyplot(fig1)
 
+<<<<<<< HEAD
     return None
+=======
+    wc = lda_wordcloud(pred, 'tweet')
+
+    st.pyplot(wc)
+
+>>>>>>> 48814f7... added wordcloud
 
 
 @st.cache
@@ -285,8 +294,6 @@ def main():
         st.plotly_chart(fig_pie, use_container_width=True)
 
     if analysis == "Prediction":
-        # pipeline = joblib.load('data/model.joblib')
-        print("loaded model")
         st.header("Green Mood Tracker Model Predictions")
         # inputs from user
         country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
