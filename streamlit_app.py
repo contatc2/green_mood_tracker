@@ -1,20 +1,14 @@
 
-import pytz
+import datetime
 import streamlit as st
-import streamlit.components.v1 as components
-import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import altair as alt
-from datetime import datetime
-from termcolor import colored
-from green_mood_tracker.datavisstreamlit import all_plotting
 from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tweet
 from green_mood_tracker.datavisstreamlit import plot_map
 from green_mood_tracker.clustering import lda_wordcloud
 from green_mood_tracker.predict import twint_prediction
-from green_mood_tracker.utils import simple_time_tracker
 from green_mood_tracker.data import get_twint_data
 
 
@@ -24,11 +18,6 @@ img = st.image('green_mood_tracker/assets/green_mood_tracker_logo.png',
                style='left', width=700, output_format='png')
 
 st.markdown("**Energy Sentiment Analysis**")
-
-
-@st.cache
-def read_data():
-    pass
 
 
 def sl_predict(country_prediction, topic_prediction, date):
@@ -45,31 +34,19 @@ def sl_predict(country_prediction, topic_prediction, date):
     labels = 'Positive', 'Negative'
     sizes = [class_1, class_2]
 
-    # fig1, ax1 = plt.subplots()
     fig_1 = px.pie(values=sizes, names=labels, color_discrete_sequence=px.colors.sequential.YlGn)
     fig_1.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color='#000000',
-                                  marker=dict(colors=['#008000', '#ff0000'], line=dict(color='#000000', width=1.5)))
-
-
-    # ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
-    #         shadow=True, startangle=90)
-    # # Equal aspect ratio ensures that pie is drawn as a circle.
-    # ax1.axis('equal')
-
-    # with open('style.css') as f:
-    #     st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+                                  marker=dict(colors=['#00B050', '#cc2936'], line=dict(color='#EBECF0', width=1.5)))
 
     for k in range(5):
         st.markdown(
-            f"<h2 style='text-align':center;> Tweet {k}</h2>", unsafe_allow_html=True)
+            f"<h6 style='margin-bottom':0!important;> <u>user0{k}@london</u></h6>", unsafe_allow_html=True)
         if pred.iloc[k]['polarity']:
             st.markdown(
-                f"<h4 style=color:green;> {pred.iloc[k]['tweet']}</h4>", unsafe_allow_html=True)
+                f"<p style=color:#00B050;> '<em>{pred.iloc[k]['tweet']}</em>'</p>", unsafe_allow_html=True)
         else:
             st.markdown(
-                f"<h4 style=color:red;> {pred.iloc[k]['tweet']}</h4>", unsafe_allow_html=True)
-        # st.write('Negative' if not pred.iloc[k]['polarity'] else 'Positive')
-        st.write('')
+                f"<p style=color:#cc2936;> '<em>{pred.iloc[k]['tweet']}</em>'</p>", unsafe_allow_html=True)
 
     st.plotly_chart(fig_1, use_container_width=True)
 
@@ -227,7 +204,7 @@ def get_twint_path(topic='Solar Energy', country='USA', time='(datetime.date(201
 
 def main():
     analysis = st.sidebar.selectbox(
-        "Select", ["Live Analysis", "Data Visualisation"])
+        "Select", ["Data Visualisation", "Live Analysis"])
     if analysis == 'Data Visualisation':
         st.header('Sentiment')
         year = st.slider('Year', min_value=2010, max_value=2020)
@@ -262,13 +239,13 @@ def main():
             fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(
             ), values='Percentage of Sentiment', names='sentiment', color_discrete_sequence=px.colors.sequential.YlGn)
             fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color='#000000',
-                                  marker=dict(colors=['#ff0000', '#FFA500', '#008000'], line=dict(color='#000000', width=1.5)))
+                                  marker=dict(colors=['#cc2936', '#FFA500', '#00B050'], line=dict(color='#EBECF0', width=1.5)))
         elif like_prediction == 'Likes Per Tweet':
             c = altair_plot_like(altair_like_by_year, year)
             fig_pie = px.pie(altair_like_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(
             ), values='Percentage of Likes Per Sentiment', names='sentiment', color_discrete_sequence=px.colors.sequential.YlGn)
             fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color='#000000',
-                                  marker=dict(colors=['#ff0000', '#FFA500', '#008000'], line=dict(color='#000000', width=1.5)))
+                                  marker=dict(colors=['#cc2936', '#FFA500', '#00B050'], line=dict(color='#EBECF0', width=1.5)))
 
         c.properties(width=1000)
 
@@ -291,14 +268,13 @@ def main():
     if analysis == "Live Analysis":
         st.header("Green Mood Tracker Model Predictions")
         # inputs from user
-        country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
+        country_prediction = st.selectbox("Select Country", ['USA', 'UK'], 1)
         topic_prediction = st.selectbox("Select Topic", [
             'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
-        d3 = st.date_input("Select TimeFrame", [])
+        d3 = st.date_input("Select TimeFrame", [datetime.date(2020, 11, 1), datetime.date(2020,11, 30)])
         sl_predict(country_prediction, topic_prediction, d3)
 
 
-# print(colored(proc.sf_query, "blue"))
 # proc.test_execute()
 if __name__ == "__main__":
     main()

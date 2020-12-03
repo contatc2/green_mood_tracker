@@ -269,7 +269,7 @@ def altair_plot_like(altair_like_by_year, year):
         x="date:T",
         y="Percentage of Likes Per Sentiment:Q",
         color=alt.Color("sentiment:N", scale=alt.Scale(domain=[
-                        'Negative', 'Neutral', 'Positive'], range=['#ff0000', '#FFA500', '#008000'])),
+                        'Negative', 'Neutral', 'Positive'], range=['#cc2936', '#FFA500', '#00B050'])),
         tooltip=[alt.Tooltip("date:T"),
                  alt.Tooltip("Percentage of Likes Per Sentiment:Q"),
                  alt.Tooltip("sentiment:N")
@@ -285,7 +285,7 @@ def altair_plot_tweet(altair_sent_by_year, year):
         x="date:T",
         y="Percentage of Sentiment:Q",
         color=alt.Color("sentiment:N", scale=alt.Scale(domain=[
-                        'Negative', 'Neutral', 'Positive'], range=['#ff0000', '#FFA500', '#008000'])),
+                        'Negative', 'Neutral', 'Positive'], range=['#cc2936', '#FFA500', '#00B050'])),
         tooltip=[alt.Tooltip("date:T"),
                  alt.Tooltip("Percentage of Sentiment:Q"),
                  alt.Tooltip("sentiment:N")
