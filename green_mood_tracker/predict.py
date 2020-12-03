@@ -132,9 +132,9 @@ def evaluate_model_on_gold_standard(model_name=MODEL_NAME, model_version=MODEL_V
 
 
 if __name__ == '__main__':
-    evaluate_model_on_gold_standard(
-        model_name=MODEL_NAME, model_version='v2',
-        download_gcp=False, encode=True, binary=True)
+    # evaluate_model_on_gold_standard(
+    #     model_name=MODEL_NAME, model_version='v2',
+    #     download_gcp=False, encode=True, binary=True)
     # data_filename = 'city.csv'
     # data = get_twint_data(data_filename, local=True)
     # encode_data(data, data_filename, model_name=MODEL_NAME)
@@ -143,3 +143,4 @@ if __name__ == '__main__':
     #                       model_version=MODEL_VERSION, download_gcp=False,
     #                       encode=False)
     # print(df.head(5))
+    twint_prediction('twint_test/uktest.csv', encode=True)

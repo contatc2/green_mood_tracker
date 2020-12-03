@@ -1,11 +1,14 @@
 from green_mood_tracker.training_data import get_raw_data
-from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, UK_LIST, US_LIST
+from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, UK_LIST, USA_LIST
 import pandas as pd
+import os
+from pathlib import Path
 import string
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk import download
 from green_mood_tracker.twint_class import TWINT
+import datetime
 download('wordnet')
 download('stopwords')
 download('punkt')
@@ -62,22 +65,34 @@ def clean_series(ds):
     return ds
 
 
-def get_twint_data(filepath, Topic, date):
+def get_twint_data(filepath, country, topic, since, until):
+
+    if country == 'USA':
+        cities_list = USA_LIST
+    elif country == 'UK':
+        cities_list = UK_LIST
 
     kwargs = dict(
-        keywords=['solar', 'energy'],
+        keywords=topic.lower().split(),
         cities=cities_list,
-        since='2010-01-01 12:00:00',
+        since=f'{str(since)} 12:00:00',
         store_csv=False,
         limit=200000
     )
 
     t = TWINT(**kwargs)
-    df_solar = t.city_df()
 
-    df_solar = df_solar[date[0] < df_solar['date'] < date[1]]
+    df = t.city_df()
+    df['date'] = df['date'].apply(
+        lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
+    df = df[(since < df['date'])
+            & (df['date'] < until)]
 
-    df_solar.to_csv(filepath)
+    path = Path(filepath)
+
+    if(not os.path.isdir(str(path.parent))):
+        os.makedirs(str(path.parent))
+    df.to_csv(filepath, index=False)
 
 
 if __name__ == '__main__':

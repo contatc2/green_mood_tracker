@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from wordcloud import WordCloud, ImageColorGenerator
-from green_mood_tracker.data_cleaning import clean
+from green_mood_tracker.data import clean
 from sklearn.decomposition import LatentDirichletAllocation
 import numpy as np
 from PIL import Image
