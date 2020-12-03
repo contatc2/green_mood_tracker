@@ -33,3 +33,4 @@ datetime
 altair
 plotly
 vega-datasets
+geojson_rewind

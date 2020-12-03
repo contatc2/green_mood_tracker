@@ -9,12 +9,13 @@ import plotly.express as px
 import plotly as py
 import plotly.graph_objects as go
 import pickle
-from green_mood_tracker.data_cleaning import clean
+from green_mood_tracker.data import clean
 from geojson_rewind import rewind
 import json
 model_load = TFRobertaForSequenceClassification.from_pretrained('models/model_roBERTa_test_distil')
 def cleantopic(df,topic="['solar', 'energy']"):
 	df_topic = df[df['search'] == topic]
+	print(df_topic[['tweet', 'search']])
 	df_clean = clean(df_topic,'tweet')
 	ds_twint_encoded = RobertaEncoder(batch_size=64).transform(df_clean.tweet, df_clean.timezone, shuffle=True)
 	return ds_twint_encoded, df_clean
@@ -90,6 +91,7 @@ def altair_data(cum_plot_df):
 def plot_map(cum_plot_df, country='US'):
 	cum_plot_df['year'] = pd.DatetimeIndex(cum_plot_df['date']).year
 	cum_plot_df['month'] = pd.DatetimeIndex(cum_plot_df['date']).month
+	cum_plot_df['state_code'] = cum_plot_df['state_code'].replace({"East of England":"East","Yorkshire":"Yorkshire and the Humber",})
 	if country == "UK":
 		with open('green_mood_tracker/raw_data/uk_regions.geojson') as f:
 			data = json.load(f)
@@ -230,13 +232,17 @@ def altair_plot_tweet(altair_sent_by_year,year):
 
 
 def all_plotting(topic="['solar', 'energy']"):
-	us_twint = pd.read_csv('green_mood_tracker/raw_data/twint_US.csv',dtype={"date": "string", "tweet": "string"})
-	uk_twint = pd.read_csv('green_mood_tracker/raw_data/twint_data_UK.csv',dtype={"date": "string", "tweet": "string"})
-	ds_twint_encoded, df_clean = cleantopic(us_twint)
-	submission_pre = results(ds_twint_encoded, df_clean)
+	#us_twint = pd.read_csv('green_mood_tracker/raw_data/twint_US.csv',dtype={"date": "string", "tweet": "string"})
+	uk_twint = pd.read_csv('green_mood_tracker/raw_data/twint_data_UK.csv',dtype={"nlikes":"float64"})
 
-	comment_dataframe = comment_dataframe_prep(df_clean, submission_pre)
-	comment_dataframe.to_csv("green_mood_tracker/raw_data/US/solar.csv")
+	topics = ["['energy', 'bills']","['solar', 'power']", "['nuclear', 'power']", "['wind', 'power']"]
+
+	for topic in topics:
+		ds_twint_encoded, df_clean = cleantopic(uk_twint, topic)
+		submission_pre = results(ds_twint_encoded, df_clean)
+
+		comment_dataframe = comment_dataframe_prep(df_clean, submission_pre)
+		comment_dataframe.to_csv(f"green_mood_tracker/raw_data/{topic}.csv")
 if __name__ == "__main__":
 	#df = read_data()
 	all_plotting(topic="['solar', 'energy']")
