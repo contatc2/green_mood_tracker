@@ -9,7 +9,7 @@ import plotly.express as px
 import plotly as py
 import plotly.graph_objects as go
 import pickle
-from green_mood_tracker.data_cleaning import clean
+from green_mood_tracker.data import clean
 from geojson_rewind import rewind
 import json
 model_load = TFRobertaForSequenceClassification.from_pretrained('models/model_roBERTa_test_distil')
@@ -73,10 +73,22 @@ def cumulative_features(comment_dataframe):
 
 	return cum_plot_df
 
-def polarity_calc(df_segmented_year):
-	df_segmented_year['count'] = 1
-	plotly_df = df_segmented_year.copy().groupby('state_code').agg({'prob_neg': 'sum','prob_pos': 'sum','count':'count'}).reset_index()
-	plotly_df['polarity_av'] = plotly_df.copy().apply(lambda x: (x['prob_pos']-x['prob_neg'])/x['count'], axis=1)
+def polarity_calc(df_segmented_year,country='US', like_prediction = 'Per Tweet'):
+	df_segmented_year['nlikes'] = df_segmented_year['nlikes'].copy() + 1
+	if like_prediction == 'Per Tweet':
+		df_segmented_year['count'] = 1
+		plotly_df = df_segmented_year.copy().groupby('state_code').agg({'prob_neg': 'sum','prob_pos': 'sum','count':'count'}).reset_index()
+		plotly_df['polarity_av'] = plotly_df.copy().apply(lambda x: (x['prob_pos']-x['prob_neg'])/x['count'], axis=1)
+	elif like_prediction == 'Likes Per Tweet':
+		plotly_df = df_segmented_year.copy()
+		plotly_df['count'] = 1
+		plotly_df['like_polarity_pos'] = plotly_df.copy().apply(lambda x: (x['prob_pos']*x['nlikes']), axis=1)
+		plotly_df['like_polarity_neg'] = plotly_df.copy().apply(lambda x: (x['prob_neg']*x['nlikes']), axis=1)
+		plotly_df = plotly_df.copy().groupby('state_code').agg({'like_polarity_pos': 'sum','like_polarity_neg': 'sum','count':'count'}).reset_index()
+		plotly_df['polarity_av'] = plotly_df.copy().apply(lambda x: (x['like_polarity_pos']-x['like_polarity_neg'])/x['count'], axis=1)
+		#av_mean = plotly_df.polarity_av.mean()
+		#av_std = plotly_df.polarity_av.std()
+		#plotly_df['polarity_av_norm'] = plotly_df.copy().apply(lambda x: (x['polarity_av']- av_mean)/av_std, axis=1)
 	return plotly_df
 
 
@@ -110,27 +122,36 @@ def altair_data(cum_plot_df):
 	return altrair_like_sum,  altrair_sent_sum
 
 
-def plot_map(cum_plot_df, country='US'):
+def plot_map(cum_plot_df, country='US',like_prediction = 'Per Tweet'):
+
 	cum_plot_df['year'] = pd.DatetimeIndex(cum_plot_df['date']).year
 	cum_plot_df['month'] = pd.DatetimeIndex(cum_plot_df['date']).month
+	if like_prediction == 'Per Tweet':
+		zmin = -1
+		zmax = 1
+	elif like_prediction == 'Likes Per Tweet':
+		zmin = -2
+		zmax = 2
+
 	if country == "UK":
 		with open('green_mood_tracker/raw_data/uk_regions.geojson') as f:
 			data = json.load(f)
 
 		data_wind = rewind(data, rfc7946=False)
+		cum_plot_df['state_code'] = cum_plot_df['state_code'].replace({"East of England":"East","Yorkshire":"Yorkshire and the Humber",})
 
 	# your color-scale
 	scl = [[0.0, "#800000"],[0.25, '#ff0000'],[0.5, '#ffa500'],
 		   [0.75, '#00ff00'],[1.0, '#008000']] # purples
 
 	data_slider = []
-	figs_uk=[]
 	altair_sent_by_year = []
 	altair_like_by_year = []
+
 	for year in cum_plot_df['year'].unique():
 
 		df_segmented_year =  cum_plot_df[(cum_plot_df['year'] == year)]
-		df_segmented = polarity_calc(df_segmented_year)
+		df_segmented = polarity_calc(df_segmented_year, like_prediction = like_prediction)
 		altrair_sent_final = pd.DataFrame(columns = ['date','Percentage of Sentiment','sentiment','month'])
 		altrair_like_final = pd.DataFrame(columns = ['date','Percentage of Likes Per Sentiment','sentiment','month'])
 
@@ -159,22 +180,22 @@ def plot_map(cum_plot_df, country='US'):
 								z=df_segmented['polarity_av'].astype(float),
 								locationmode='USA-states',
 								colorscale = scl,
-								zmin=-1,
-								zmax=1,
-								colorbar= {'title':'Positive sentiment Percentage'})
+								zmin=zmin,
+								zmax=zmax,
+								colorbar= {'title':'Sentiment Polarity Rating'})
 
 			data_slider.append(data_each_yr)
 		elif country == 'UK':
-			fig_2 = px.choropleth(df_segmented, geojson=data_wind, color='polarity_av',
-					locations='state_code', featureidkey="properties.rgn19nm",
-					projection="mercator",
-					scope='europe',
-					range_color = [1,-1],
-					#color_continuous_scale=px.colors.sequential.Plasma
-					color_continuous_scale = scl
-				   )
-			fig_2.update_geos(fitbounds="locations", visible=False)
-			figs_uk.append(fig_2)
+			data_each_yr = dict(type='choropleth',
+                    locations = df_segmented['state_code'],
+                    z=df_segmented['polarity_av'].astype(float),
+                    geojson=data_wind,
+                    featureidkey="properties.rgn19nm",
+                    colorscale = scl,
+                    zmin=zmin,
+                    zmax=zmax,
+                    colorbar= {'title':'Sentiment Polarity Rating'})
+			data_slider.append(data_each_yr)
 	#steps = []
 	#for i in range(len(data_slider)):
 		#step = dict(method='restyle',
@@ -188,10 +209,12 @@ def plot_map(cum_plot_df, country='US'):
 		layout = dict(geo=dict(scope='usa',
 							   projection={'type': 'albers usa'}),
 					  )
-		return altair_sent_by_year, altair_like_by_year, layout, data_slider
 
 	elif country == 'UK':
-		return altair_sent_by_year, altair_like_by_year, figs_uk
+		layout = dict(geo=dict(scope='europe',
+                       projection={'type': 'mercator'}),)
+
+	return altair_sent_by_year, altair_like_by_year, layout, data_slider
 
 
 

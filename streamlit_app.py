@@ -27,259 +27,109 @@ st.markdown("**Energy Sentiment Analysis**")
 
 @st.cache
 def read_data():
-    pass
+	pass
 
 @st.cache
-def select_data(topic='Solar Energy',country='USA'):
+def select_data(topic='Solar Energy',country='USA',like_prediction = 'Per Tweet'):
 	if country == 'USA':
 		if topic == 'Climate Change':
 			comment_dataframe_US_climate = pd.read_csv("green_mood_tracker/raw_data/US/[_climate_, _change_].csv")
-			altair_sent_by_year_US_climate, altair_like_by_year_US_climate, layout_US_climate, data_slider_US_climate = plot_map(comment_dataframe_US_climate,country='US')
+			altair_sent_by_year_US_climate, altair_like_by_year_US_climate, layout_US_climate, data_slider_US_climate = plot_map(comment_dataframe_US_climate,country='US',like_prediction = like_prediction)
 			return altair_sent_by_year_US_climate, altair_like_by_year_US_climate, layout_US_climate, data_slider_US_climate
 
 		elif topic == 'Energy Prices':
 			comment_dataframe_US_prices = pd.read_csv("green_mood_tracker/raw_data/US/[_energy_, _prices_].csv")
-			altair_sent_by_year_US_prices, altair_like_by_year_US_prices, layout_US_prices, data_slider_US_prices = plot_map(comment_dataframe_US_prices,country='US')
+			altair_sent_by_year_US_prices, altair_like_by_year_US_prices, layout_US_prices, data_slider_US_prices = plot_map(comment_dataframe_US_prices,country='US',like_prediction = like_prediction)
 			return altair_sent_by_year_US_prices, altair_like_by_year_US_prices, layout_US_prices, data_slider_US_prices
 
 		elif topic == 'Green Energy':
 			comment_dataframe_US_green = pd.read_csv("green_mood_tracker/raw_data/US/[_green_, _energy_].csv")
-			altair_sent_by_year_US_green, altair_like_by_year_US_green, layout_US_green, data_slider_US_green = plot_map(comment_dataframe_US_green,country='US')
+			altair_sent_by_year_US_green, altair_like_by_year_US_green, layout_US_green, data_slider_US_green = plot_map(comment_dataframe_US_green,country='US',like_prediction = like_prediction)
 			return altair_sent_by_year_US_green, altair_like_by_year_US_green, layout_US_green, data_slider_US_green
 
 		elif topic == 'Nuclear Energy':
 			comment_dataframe_US_nuclear = pd.read_csv("green_mood_tracker/raw_data/US/[_nuclear_, _energy_].csv")
-			altair_sent_by_year_US_nuclear, altair_like_by_year_US_nuclear, layout_US_nuclear, data_slider_US_nuclear = plot_map(comment_dataframe_US_nuclear,country='US')
+			altair_sent_by_year_US_nuclear, altair_like_by_year_US_nuclear, layout_US_nuclear, data_slider_US_nuclear = plot_map(comment_dataframe_US_nuclear,country='US',like_prediction = like_prediction)
 			return altair_sent_by_year_US_nuclear, altair_like_by_year_US_nuclear, layout_US_nuclear, data_slider_US_nuclear
 
 		elif topic == 'Fossil Fuels':
 			comment_dataframe_US_fossil = pd.read_csv("green_mood_tracker/raw_data/US/[_fossil_, _fuels_].csv")
-			altair_sent_by_year_US_fossil, altair_like_by_year_US_fossil, layout_US_fossil, data_slider_US_fossil = plot_map(comment_dataframe_US_fossil,country='US')
+			altair_sent_by_year_US_fossil, altair_like_by_year_US_fossil, layout_US_fossil, data_slider_US_fossil = plot_map(comment_dataframe_US_fossil,country='US',like_prediction = like_prediction)
 			return altair_sent_by_year_US_fossil, altair_like_by_year_US_fossil, layout_US_fossil, data_slider_US_fossil
 
 		elif topic == 'Solar Energy':
 			comment_dataframe_US_solar = pd.read_csv("green_mood_tracker/raw_data/US/[_solar_, _energy_].csv")
-			altair_sent_by_year_US_solar, altair_like_by_year_US_solar, layout_US_solar, data_slider_US_solar = plot_map(comment_dataframe_US_solar,country='US')
+			altair_sent_by_year_US_solar, altair_like_by_year_US_solar, layout_US_solar, data_slider_US_solar = plot_map(comment_dataframe_US_solar,country='US',like_prediction = like_prediction)
 			return altair_sent_by_year_US_solar, altair_like_by_year_US_solar, layout_US_solar, data_slider_US_solar
 
 		elif topic == 'Wind Energy':
 			comment_dataframe_US_wind = pd.read_csv("green_mood_tracker/raw_data/US/[_wind_, _energy_].csv")
-			altair_sent_by_year_US_wind, altair_like_by_year_US_wind, layout_US_wind, data_slider_US_wind = plot_map(comment_dataframe_US_wind,country='US')
+			altair_sent_by_year_US_wind, altair_like_by_year_US_wind, layout_US_wind, data_slider_US_wind = plot_map(comment_dataframe_US_wind,country='US',like_prediction = like_prediction)
 			return altair_sent_by_year_US_wind, altair_like_by_year_US_wind, layout_US_wind, data_slider_US_wind
 
 	elif country == 'UK':
 		if topic == 'Climate Change':
 			comment_dataframe_UK_climate = pd.read_csv("green_mood_tracker/raw_data/UK/[_climate_, _change_].csv")
-			altair_sent_by_year_UK_climate, altair_like_by_year_UK_climate,figs_UK_climate = plot_map(comment_dataframe_UK_climate,country='UK')
-			return altair_sent_by_year_UK_climate, altair_like_by_year_UK_climate, figs_UK_climate
+			altair_sent_by_year_UK_climate, altair_like_by_year_UK_climate,layout, data_slider = plot_map(comment_dataframe_UK_climate,country='UK',like_prediction = like_prediction)
+			return altair_sent_by_year_UK_climate, altair_like_by_year_UK_climate, layout, data_slider
 
 		elif topic == 'Energy Prices':
 			comment_dataframe_UK_prices = pd.read_csv("green_mood_tracker/raw_data/UK/[_energy_, _prices_].csv")
-			altair_sent_by_year_UK_prices, altair_like_by_year_UK_prices, figs_UK_prices = plot_map(comment_dataframe_UK_prices,country='UK')
-			return altair_sent_by_year_UK_prices, altair_like_by_year_UK_prices, figs_UK_prices
+			altair_sent_by_year_UK_prices, altair_like_by_year_UK_prices, layout, data_slider = plot_map(comment_dataframe_UK_prices,country='UK',like_prediction = like_prediction)
+			return altair_sent_by_year_UK_prices, altair_like_by_year_UK_prices, layout, data_slider
 
 		elif topic == 'Green Energy':
 			comment_dataframe_UK_green = pd.read_csv("green_mood_tracker/raw_data/UK/[_green_, _energy_].csv")
-			altair_sent_by_year_UK_green, altair_like_by_year_UK_green, figs_UK_green = plot_map(comment_dataframe_UK_green,country='UK')
-			return altair_sent_by_year_UK_green, altair_like_by_year_UK_green, figs_UK_green
+			altair_sent_by_year_UK_green, altair_like_by_year_UK_green, layout, data_slider = plot_map(comment_dataframe_UK_green,country='UK',like_prediction = like_prediction)
+			return altair_sent_by_year_UK_green, altair_like_by_year_UK_green, layout, data_slider
 
 		elif topic == 'Nuclear Energy':
 			comment_dataframe_UK_nuclear = pd.read_csv("green_mood_tracker/raw_data/UK/[_nuclear_, _energy_].csv")
-			altair_sent_by_year_UK_nuclear, altair_like_by_year_UK_nuclear, figs_UK_nuclear = plot_map(comment_dataframe_UK_nuclear,country='UK')
-			return altair_sent_by_year_UK_nuclear, altair_like_by_year_UK_nuclear, figs_UK_nuclear
+			altair_sent_by_year_UK_nuclear, altair_like_by_year_UK_nuclear, layout, data_slider = plot_map(comment_dataframe_UK_nuclear,country='UK',like_prediction = like_prediction)
+			return altair_sent_by_year_UK_nuclear, altair_like_by_year_UK_nuclear, layout, data_slider
 
 		elif topic == 'Fossil Fuels':
 			comment_dataframe_UK_fossil = pd.read_csv("green_mood_tracker/raw_data/UK/[_fossil_, _fuels_].csv")
-			altair_sent_by_year_UK_fossil, altair_like_by_year_UK_fossil, figs_UK_fossil = plot_map(comment_dataframe_UK_fossil,country='UK')
-			return altair_sent_by_year_UK_fossil, altair_like_by_year_UK_fossil, figs_UK_fossil
+			altair_sent_by_year_UK_fossil, altair_like_by_year_UK_fossil, layout, data_slider = plot_map(comment_dataframe_UK_fossil,country='UK',like_prediction = like_prediction)
+			return altair_sent_by_year_UK_fossil, altair_like_by_year_UK_fossil, layout, data_slider
 
 		elif topic == 'Solar Energy':
 			comment_dataframe_UK_solar = pd.read_csv("green_mood_tracker/raw_data/UK/[_solar_, _energy_].csv")
-			altair_sent_by_year_UK_solar, altair_like_by_year_UK_solar, layout_UK_solar, data_slider_UK_solar = plot_map(comment_dataframe_UK_solar,country='UK')
-			return altair_sent_by_year_UK_solar, altair_like_by_year_UK_solar, figs_UK_solar
+			altair_sent_by_year_UK_solar, altair_like_by_year_UK_solar, layout, data_slider = plot_map(comment_dataframe_UK_solar,country='UK',like_prediction = like_prediction)
+			return altair_sent_by_year_UK_solar, altair_like_by_year_UK_solar, layout, data_slider
 
 		elif topic == 'Wind Energy':
 			comment_dataframe_UK_wind = pd.read_csv("green_mood_tracker/raw_data/UK/[_wind_, _energy_].csv")
-			altair_sent_by_year_UK_wind, altair_like_by_year_UK_wind, figs_UK_wind = plot_map(comment_dataframe_UK_wind,country='UK')
-			return altair_sent_by_year_UK_wind, altair_like_by_year_UK_wind, figs_UK_wind
+			altair_sent_by_year_UK_wind, altair_like_by_year_UK_wind, layout, data_slider = plot_map(comment_dataframe_UK_wind,country='UK',like_prediction = like_prediction)
+			return altair_sent_by_year_UK_wind, altair_like_by_year_UK_wind, layout, data_slider
 
-#@st.cache
-#def select_data(topic='Solar Energy', country='USA'):
-#    if country == 'USA':
-#        if topic == 'Climate Change':
-#            comment_dataframe_US_climate = pd.read_csv(
-#                "green_mood_tracker/raw_data/US/[_climate_, _change_].csv")
-#            altair_sent_by_year_US_climate, altair_like_by_year_US_climate, layout_US_climate, data_slider_US_climate = plot_map(
-#                comment_dataframe_US_climate)
-#            return altair_sent_by_year_US_climate, altair_like_by_year_US_climate, layout_US_climate, data_slider_US_climate
-
-#        elif topic == 'Energy Prices':
-#            comment_dataframe_US_prices = pd.read_csv(
-#                "green_mood_tracker/raw_data/US/[_energy_, _prices_].csv")
-#            altair_sent_by_year_US_prices, altair_like_by_year_US_prices, layout_US_prices, data_slider_US_prices = plot_map(
-#                comment_dataframe_US_prices)
-#            return altair_sent_by_year_US_prices, altair_like_by_year_US_prices, layout_US_prices, data_slider_US_prices
-#
-#        elif topic == 'Green Energy':
-#            comment_dataframe_US_green = pd.read_csv(
-#                "green_mood_tracker/raw_data/US/[_green_, _energy_].csv")
-#            altair_sent_by_year_US_green, altair_like_by_year_US_green, layout_US_green, data_slider_US_green = plot_map(
-#                comment_dataframe_US_green)
-#            return altair_sent_by_year_US_green, altair_like_by_year_US_green, layout_US_green, data_slider_US_green
-
-#        elif topic == 'Nuclear Energy':
-#            comment_dataframe_US_nuclear = pd.read_csv(
-#                "green_mood_tracker/raw_data/US/[_nuclear_, _energy_].csv")
-#            altair_sent_by_year_US_nuclear, altair_like_by_year_US_nuclear, layout_US_nuclear, data_slider_US_nuclear = plot_map(
-#                comment_dataframe_US_nuclear)
-#            return altair_sent_by_year_US_nuclear, altair_like_by_year_US_nuclear, layout_US_nuclear, data_slider_US_nuclear
-
-#        elif topic == 'Fossil Fuels':
-#            comment_dataframe_US_fossil = pd.read_csv(
-#                "green_mood_tracker/raw_data/US/[_fossil_, _fuels_].csv")
-#            altair_sent_by_year_US_fossil, altair_like_by_year_US_fossil, layout_US_fossil, data_slider_US_fossil = plot_map(
-#                comment_dataframe_US_fossil)
-#            return altair_sent_by_year_US_fossil, altair_like_by_year_US_fossil, layout_US_fossil, data_slider_US_fossil
-
-#        elif topic == 'Solar Energy':
-#            comment_dataframe_US_solar = pd.read_csv(
-#                "green_mood_tracker/raw_data/US/[_solar_, _energy_].csv")
-#            altair_sent_by_year_US_solar, altair_like_by_year_US_solar, layout_US_solar, data_slider_US_solar = plot_map(
-#                comment_dataframe_US_solar)
-#            return altair_sent_by_year_US_solar, altair_like_by_year_US_solar, layout_US_solar, data_slider_US_solar
-
-#        elif topic == 'Wind Energy':
-#            comment_dataframe_US_wind = pd.read_csv(
-#                "green_mood_tracker/raw_data/US/[_wind_, _energy_].csv")
-#            altair_sent_by_year_US_wind, altair_like_by_year_US_wind, layout_US_wind, data_slider_US_wind = plot_map(
-#                comment_dataframe_US_wind)
-#            return altair_sent_by_year_US_wind, altair_like_by_year_US_wind, layout_US_wind, data_slider_US_wind
-
-#    elif country == 'UK':
-#        if topic == 'Climate Change':
-#            comment_dataframe_UK_climate = pd.read_csv(
-#                "green_mood_tracker/raw_data/UK/[_climate_, _change_].csv")
-#            altair_sent_by_year_UK_climate, altair_like_by_year_UK_climate, layout_UK_climate, data_slider_UK_climate = plot_map(
-#                comment_dataframe_UK_climate)
-#            return altair_sent_by_year_UK_climate, altair_like_by_year_UK_climate, layout_UK_climate, data_slider_UK_climate
-
-#        elif topic == 'Energy Prices':
-#            comment_dataframe_UK_prices = pd.read_csv(
-#                "green_mood_tracker/raw_data/UK/[_energy_, _prices_].csv")
-#            altair_sent_by_year_UK_prices, altair_like_by_year_UK_prices, layout_UK_prices, data_slider_UK_prices = plot_map(
-#                comment_dataframe_UK_prices)
-#            return altair_sent_by_year_UK_prices, altair_like_by_year_UK_prices, layout_UK_prices, data_slider_UK_prices
-
-#        elif topic == 'Green Energy':
-#            comment_dataframe_UK_green = pd.read_csv(
-#                "green_mood_tracker/raw_data/UK/[_green_, _energy_].csv")
-#            altair_sent_by_year_UK_green, altair_like_by_year_UK_green, layout_UK_green, data_slider_UK_green = plot_map(
-#                comment_dataframe_UK_green)
-#            return altair_sent_by_year_UK_green, altair_like_by_year_UK_green, layout_UK_green, data_slider_UK_green
-
-#        elif topic == 'Nuclear Energy':
-#            comment_dataframe_UK_nuclear = pd.read_csv(
-#                "green_mood_tracker/raw_data/UK/[_nuclear_, _energy_].csv")
-#            altair_sent_by_year_UK_nuclear, altair_like_by_year_UK_nuclear, layout_UK_nuclear, data_slider_UK_nuclear = plot_map(
-#                comment_dataframe_UK_nuclear)
-#            return altair_sent_by_year_UK_nuclear, altair_like_by_year_UK_nuclear, layout_UK_nuclear, data_slider_UK_nuclear
-
-#        elif topic == 'Fossil Fuels':
-#            comment_dataframe_UK_fossil = pd.read_csv(
-#                "green_mood_tracker/raw_data/UK/[_fossil_, _fuels_].csv")
-#            altair_sent_by_year_UK_fossil, altair_like_by_year_UK_fossil, layout_UK_fossil, data_slider_UK_fossil = plot_map(
-#                comment_dataframe_UK_fossil)
-#            return altair_sent_by_year_UK_fossil, altair_like_by_year_UK_fossil, layout_UK_fossil, data_slider_UK_fossil
-
-#        elif topic == 'Solar Energy':
-#            comment_dataframe_UK_solar = pd.read_csv(
-#                "green_mood_tracker/raw_data/UK/[_solar_, _energy_].csv")
-#            altair_sent_by_year_UK_solar, altair_like_by_year_UK_solar, layout_UK_solar, data_slider_UK_solar = plot_map(
-#                comment_dataframe_UK_solar)
-#            return altair_sent_by_year_UK_solar, altair_like_by_year_UK_solar, layout_UK_solar, data_slider_UK_solar
-
-#        elif topic == 'Wind Energy':
-#            comment_dataframe_UK_wind = pd.read_csv(
-#                "green_mood_tracker/raw_data/UK/[_wind_, _energy_].csv")
-#            altair_sent_by_year_UK_wind, altair_like_by_year_UK_wind, layout_UK_wind, data_slider_UK_wind = plot_map(
-#                comment_dataframe_UK_wind)
-#            return altair_sent_by_year_UK_wind, altair_like_by_year_UK_wind, layout_UK_wind, data_slider_UK_wind
-
-
-def select_prediction_data(topic='Solar Energy', country='USA', time='(datetime.date(2010, 12, 1), datetime.date(2020, 12, 1))'):
-    if country == 'USA':
-        if topic == 'Climate Change':
-            pd.read_csv(
-                "green_mood_tracker/raw_data/US/[_climate_, _change_].csv")
-
-            return "green_mood_tracker/raw_data/US/[_climate_, _change_].csv"
-
-        elif topic == 'Energy Prices':
-            return "green_mood_tracker/raw_data/US/[_energy_, _prices_].csv"
-
-        elif topic == 'Green Energy':
-            return "green_mood_tracker/raw_data/US/[_green_, _energy_].csv"
-
-        elif topic == 'Nuclear Energy':
-            return "green_mood_tracker/raw_data/US/[_nuclear_, _energy_].csv"
-
-        elif topic == 'Fossil Fuels':
-            return "green_mood_tracker/raw_data/US/[_fossil_, _fuels_].csv"
-
-        elif topic == 'Solar Energy':
-            return "green_mood_tracker/raw_data/US/[_solar_, _energy_].csv"
-
-        elif topic == 'Wind Energy':
-            return "green_mood_tracker/raw_data/US/[_wind_, _energy_].csv"
-
-    elif country == 'UK':
-        if topic == 'Climate Change':
-            return "green_mood_tracker/raw_data/UK/[_climate_, _change_].csv"
-
-        elif topic == 'Energy Prices':
-            return "green_mood_tracker/raw_data/UK/[_energy_, _prices_].csv"
-
-        elif topic == 'Green Energy':
-            return "green_mood_tracker/raw_data/UK/[_green_, _energy_].csv"
-
-        elif topic == 'Nuclear Energy':
-            return "green_mood_tracker/raw_data/UK/[_nuclear_, _energy_].csv"
-
-        elif topic == 'Fossil Fuels':
-            return "green_mood_tracker/raw_data/UK/[_fossil_, _fuels_].csv"
-
-        elif topic == 'Solar Energy':
-            return "green_mood_tracker/raw_data/UK/[_solar_, _energy_].csv"
-
-        elif topic == 'Wind Energy':
-            return "green_mood_tracker/raw_data/UK/[_wind_, _energy_].csv"
 
 
 def format_input(pickup, dropoff, passengers=1):
-    pickup_datetime = datetime.utcnow().replace(
-        tzinfo=pytz.timezone('America/New_York'))
-    formated_input = {
-        "pickup_latitude": pickup["latitude"],
-        "pickup_longitude": pickup["longitude"],
-        "dropoff_latitude": dropoff["latitude"],
-        "dropoff_longitude": dropoff["longitude"],
-        "passenger_count": passengers,
-        "pickup_datetime": str(pickup_datetime),
-        "key": str(pickup_datetime)}
-    return formated_input
+	pickup_datetime = datetime.utcnow().replace(
+		tzinfo=pytz.timezone('America/New_York'))
+	formated_input = {
+		"pickup_latitude": pickup["latitude"],
+		"pickup_longitude": pickup["longitude"],
+		"dropoff_latitude": dropoff["latitude"],
+		"dropoff_longitude": dropoff["longitude"],
+		"passenger_count": passengers,
+		"pickup_datetime": str(pickup_datetime),
+		"key": str(pickup_datetime)}
+	return formated_input
 
 
 def sl_predict(country_prediction, topic_prediction, d3):
 
-    st.write(type(d3))
-    st.write(d3)
+	st.write(type(d3))
+	st.write(d3)
 
-    select_prediction_data(topic='Solar Energy', country='USA',
-                           time='(datetime.date(2010, 12, 2), datetime.date(2030, 12, 2))')
+	select_prediction_data(topic='Solar Energy', country='USA',
+						   time='(datetime.date(2010, 12, 2), datetime.date(2030, 12, 2))')
 
-    pred = twint_prediction('UK/[_climate_, _change_].csv')
+	pred = twint_prediction('UK/[_climate_, _change_].csv')
 
-    st.write(pred)
+	st.write(pred)
 
 
 	return None
@@ -287,7 +137,7 @@ def sl_predict(country_prediction, topic_prediction, d3):
 
 def main():
 	analysis = st.sidebar.selectbox(
-	    "Select", ["Prediction", "Data Visualisation"])
+		"Select", ["Prediction", "Data Visualisation"])
 	if analysis == 'Data Visualisation':
 		st.header('Sentiment')
 		year = st.slider('Year', min_value=2010, max_value=2020)
@@ -298,18 +148,21 @@ def main():
 		st.text(" \n")
 		st.text(" \n")
 		st.text(" \n")
-		st.markdown(f'**Percentage of Positive Sentiment Towards {topic_prediction} by State in the {country_prediction} since 2010**')
+		if like_prediction == 'Per Tweet':
+			st.markdown(f'**Tweet Sentiment Polarity Rating Towards {topic_prediction} by State in the {country_prediction} in  {year}**')
+		elif like_prediction == 'Likes Per Tweet':
+			st.markdown(f'**Tweet Sentiment Polarity Rating Towards {topic_prediction} by State in the {country_prediction} in  {year}**')
 
 			#data = 'green_mood_tracker/raw_data/twint_US.csv'
 			#df = pd.read_csv(data)
 			#df['year']= pd.to_datetime(df['date'], format='%Y-%m-%d %H:%M:%S', errors= 'coerce').dt.year
 			#df = df[df['year'] == year]
-		if country_prediction == 'USA':
-			altair_sent_by_year, altair_like_by_year, layout, data_slider = select_data(topic=topic_prediction,country=country_prediction)
-			fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
-		elif country_prediction == 'UK':
-			altair_sent_by_year, altair_like_by_year,figs_uk = select_data(topic=topic_prediction,country=country_prediction)
-			fig = figs_uk[abs(year-2020)]
+
+		altair_sent_by_year, altair_like_by_year, layout, data_slider = select_data(topic=topic_prediction,country=country_prediction,like_prediction = like_prediction)
+		fig = go.Figure(data=data_slider[abs(year-2020)], layout=layout)
+
+		if country_prediction == 'UK':
+			fig.update_geos(fitbounds="locations", visible=False)
 
 		colors = ['darkgreen','darkseagreen', 'darkolivegreen']
 
@@ -323,14 +176,14 @@ def main():
 			fig_pie = px.pie(altair_like_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
 			fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color = '#000000',marker=dict(colors=colors, line=dict(color='#000000', width=1.5)))
 
-		st.plotly_chart(fig,use_container_width=True)
+		st.plotly_chart(fig,width=4000,height=4000)
 
 		st.text(" \n")
-		st.markdown('**Evolution of Sentiment Share Over Time**')
+		st.markdown(f'**Evolution of Sentiment Share Towards {topic_prediction} in {year}**')
 		st.altair_chart(c, use_container_width=True)
 
 		st.text(" \n")
-		st.markdown('**Share of Each Sentiment**')
+		st.markdown(f'**Total Share of Each Sentiment Towards {topic_prediction} in {year}**')
 		st.plotly_chart(fig_pie)
 
 
@@ -346,7 +199,7 @@ def main():
 		# inputs from user
 		country_prediction = st.selectbox("Select Country", ['UK', 'USA'], 1)
 		topic_prediction = st.selectbox("Select Topic", [
-		                                'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
+										'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
 		d3 = st.date_input("Select TimeFrame", [])
 
 		# sl_predict(country_prediction, topic_prediction, d3)
