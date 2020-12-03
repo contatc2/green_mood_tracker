@@ -18,15 +18,9 @@ from green_mood_tracker.utils import simple_time_tracker
 from green_mood_tracker.data import get_twint_data
 
 
-<<<<<<< HEAD
-
 st.set_page_config(layout='wide')
 
-
-img = st.image('green_mood_tracker/raw_data/green_mood_tracker_logo.png',
-=======
 img = st.image('green_mood_tracker/assets/green_mood_tracker_logo.png',
->>>>>>> 48814f7... added wordcloud
                style='left', width=700, output_format='png')
 
 st.markdown("**Energy Sentiment Analysis**")
@@ -73,14 +67,9 @@ def sl_predict(country_prediction, topic_prediction, date):
         st.write('')
     st.pyplot(fig1)
 
-<<<<<<< HEAD
-    return None
-=======
     wc = lda_wordcloud(pred, 'tweet')
 
     st.pyplot(wc)
-
->>>>>>> 48814f7... added wordcloud
 
 
 @st.cache
