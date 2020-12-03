@@ -284,7 +284,7 @@ def altair_plot_tweet(altair_sent_by_year, year):
 # fig_pie.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
     # marker=dict(colors=colors, line=dict(color='#000000', width=2))
 #	return fig_pie
-
+def all_plotting(topic="['solar', 'energy']"):
     us_twint = pd.read_csv('green_mood_tracker/raw_data/twint_US.csv',
                            dtype={"date": "string", "tweet": "string"})
     uk_twint = pd.read_csv('green_mood_tracker/raw_data/twint_data_UK.csv',
