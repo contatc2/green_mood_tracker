@@ -2,7 +2,6 @@ import numpy as np
 
 from transformers import RobertaTokenizerFast
 import tensorflow_datasets as tfds
-# from green_mood_tracker.utils import map_example_to_dict
 from green_mood_tracker.data import clean_series
 from green_mood_tracker.params import MAX_LENGTH
 from tensorflow.keras.preprocessing.sequence import pad_sequences
