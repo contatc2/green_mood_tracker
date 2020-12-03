@@ -1,6 +1,8 @@
 from green_mood_tracker.clustering import lda_wordcloud
+
 from green_mood_tracker.predict import twint_prediction
 from green_mood_tracker.utils import simple_time_tracker
+from green_mood_tracker.data import get_twint_data
 
 import streamlit as st
 import pytz
@@ -8,7 +10,6 @@ import pandas as pd
 import joblib
 import numpy as np
 from datetime import datetime
-
 from green_mood_tracker.datavisstreamlit import all_plotting
 from green_mood_tracker.datavisstreamlit import altair_plot_like, altair_plot_tweet
 from green_mood_tracker.datavisstreamlit import plot_map
@@ -16,18 +17,34 @@ import plotly.express as px
 import plotly.graph_objects as go
 import altair as alt
 
+#from TaxiFareModel.data import get_data
+#from TaxiFareModel.utils import geocoder_here
+img = st.image('green_mood_tracker/raw_data/green_mood_tracker_logo.png',
+               style='left', width=700, output_format='png')
 
-# from TaxiFareModel.data import get_data
-# from TaxiFareModel.utils import geocoder_here
-
-
-st.markdown("# Green Mood Tracker")
 st.markdown("**Energy Sentiment Analysis**")
 
 
 @st.cache
 def read_data():
 	pass
+
+def sl_predict(country_prediction, topic_prediction, date):
+
+    st.write(type(date))
+    st.write(date)
+
+    filepath = 'twint_test/uk-data-test.csv'
+
+    get_twint_data(filepath, country=country_prediction, topic=topic_prediction,
+                   since=date[0], until=date[1])
+
+    pred = twint_prediction(filepath, encode=True)
+
+    st.write(pred.head())
+
+    return None
+
 
 @st.cache
 def select_data(topic='Solar Energy',country='USA',like_prediction = 'Per Tweet'):
@@ -105,35 +122,48 @@ def select_data(topic='Solar Energy',country='USA',like_prediction = 'Per Tweet'
 
 
 
-def format_input(pickup, dropoff, passengers=1):
-	pickup_datetime = datetime.utcnow().replace(
-		tzinfo=pytz.timezone('America/New_York'))
-	formated_input = {
-		"pickup_latitude": pickup["latitude"],
-		"pickup_longitude": pickup["longitude"],
-		"dropoff_latitude": dropoff["latitude"],
-		"dropoff_longitude": dropoff["longitude"],
-		"passenger_count": passengers,
-		"pickup_datetime": str(pickup_datetime),
-		"key": str(pickup_datetime)}
-	return formated_input
+def get_twint_path(topic='Solar Energy', country='USA', time='(datetime.date(2010, 12, 1), datetime.date(2020, 12, 1))'):
+    if country == 'USA':
+        if topic == 'Climate Change':
+            return "green_mood_tracker/raw_data/US/[_climate_, _change_].csv"
 
+        elif topic == 'Energy Prices':
+            return "green_mood_tracker/raw_data/US/[_energy_, _prices_].csv"
 
-def sl_predict(country_prediction, topic_prediction, d3):
+        elif topic == 'Green Energy':
+            return "green_mood_tracker/raw_data/US/[_green_, _energy_].csv"
 
-	st.write(type(d3))
-	st.write(d3)
+        elif topic == 'Nuclear Energy':
+            return "green_mood_tracker/raw_data/US/[_nuclear_, _energy_].csv"
 
-	select_prediction_data(topic='Solar Energy', country='USA',
-						   time='(datetime.date(2010, 12, 2), datetime.date(2030, 12, 2))')
+        elif topic == 'Fossil Fuels':
+            return "green_mood_tracker/raw_data/US/[_fossil_, _fuels_].csv"
 
-	pred = twint_prediction('UK/[_climate_, _change_].csv')
+        elif topic == 'Solar Energy':
+            return "green_mood_tracker/raw_data/US/[_solar_, _energy_].csv"
 
-	st.write(pred)
+        elif topic == 'Wind Energy':
+            return "green_mood_tracker/raw_data/US/[_wind_, _energy_].csv"
 
+    elif country == 'UK':
+        if topic == 'Climate Change':
+            return "green_mood_tracker/raw_data/UK/[_climate_, _change_].csv"
+        elif topic == 'Energy Prices':
+            return "green_mood_tracker/raw_data/UK/[_energy_, _prices_].csv"
 
-	return None
+        elif topic == 'Green Energy':
+            return "green_mood_tracker/raw_data/UK/[_green_, _energy_].csv"
 
+        elif topic == 'Nuclear Energy':
+            return "green_mood_tracker/raw_data/UK/[_nuclear_, _energy_].csv"
+        elif topic == 'Fossil Fuels':
+            return "green_mood_tracker/raw_data/UK/[_fossil_, _fuels_].csv"
+
+        elif topic == 'Solar Energy':
+            return "green_mood_tracker/raw_data/UK/[_solar_, _energy_].csv"
+
+        elif topic == 'Wind Energy':
+            return "green_mood_tracker/raw_data/UK/[_wind_, _energy_].csv"
 
 def main():
 	analysis = st.sidebar.selectbox(
@@ -164,18 +194,6 @@ def main():
 		if country_prediction == 'UK':
 			fig.update_geos(fitbounds="locations", visible=False)
 
-		colors = ['darkgreen','darkseagreen', 'darkolivegreen']
-
-		if like_prediction == 'Per Tweet':
-			c= altair_plot_tweet(altair_sent_by_year,year)
-			fig_pie = px.pie(altair_sent_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(), values='Percentage of Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
-			fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color = '#000000',
-				marker=dict(colors=colors, line=dict(color='#000000', width=1.5)))
-		elif like_prediction == 'Likes Per Tweet':
-			c = altair_plot_like(altair_like_by_year,year)
-			fig_pie = px.pie(altair_like_by_year[abs(year-2020)].groupby('sentiment').mean().reset_index(), values='Percentage of Likes Per Sentiment', names='sentiment',color_discrete_sequence=px.colors.sequential.YlGn)
-			fig_pie.update_traces(hoverinfo='label+percent', textfont_size=12, textfont_color = '#000000',marker=dict(colors=colors, line=dict(color='#000000', width=1.5)))
-
 		st.plotly_chart(fig,width=4000,height=4000)
 
 		st.text(" \n")
@@ -186,12 +204,6 @@ def main():
 		st.markdown(f'**Total Share of Each Sentiment Towards {topic_prediction} in {year}**')
 		st.plotly_chart(fig_pie)
 
-
-		# st.write(df['tweet'])
-
-		# lda_wordcloud(df,'tweet', [2], [300], 'http://clipart-library.com/images/8T6ooLLpc.jpg')
-		# st.pyplot()
-
 	if analysis == "Prediction":
 		# pipeline = joblib.load('data/model.joblib')
 		print("loaded model")
@@ -201,31 +213,10 @@ def main():
 		topic_prediction = st.selectbox("Select Topic", [
 										'Climate Change', 'Energy Prices', 'Fossil Fuels', 'Green Energy', 'Nuclear Energy', 'Solar Energy', 'Wind Energy'], 1)
 		d3 = st.date_input("Select TimeFrame", [])
-
-		# sl_predict(country_prediction, topic_prediction, d3)
-
-
-
-		# dropoff_adress = st.text_input("dropoff adress", "434 6th Ave, New York, NY 10011")
-		# Get coords from input adresses usung HERE geocoder
-		# pickup_coords = geocoder_here(pickup_adress)
-		# dropoff_coords = geocoder_here(dropoff_adress)
-		# inputs from user
-		# passenger_counts = st.selectbox("# passengers", [1, 2, 3, 4, 5, 6], 1)
-
-
-
-		# data = pd.DataFrame([pickup_coords, dropoff_coords])
-		# to_predict = [format_input(pickup=pickup_coords, dropoff=dropoff_coords, passengers=passenger_counts)]
-		# X = pd.DataFrame(to_predict)
-		# res = pipeline.predict(X[COLS])
-		# st.write("💸 taxi fare", res[0])
-		# st.map(data=data)
-
-
+    sl_predict(country_prediction, topic_prediction, d3)
 
 
 # print(colored(proc.sf_query, "blue"))
 # proc.test_execute()
 if __name__ == "__main__":
-	main()
+    main()

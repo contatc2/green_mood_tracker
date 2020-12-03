@@ -11,6 +11,7 @@ from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, TW
 from sklearn.metrics import accuracy_score, f1_score
 from green_mood_tracker.utils import simple_time_tracker
 import tensorflow as tf
+from pathlib import Path
 
 
 def get_twint_data(data_filename, local=True, folder='raw_data'):
@@ -107,6 +108,10 @@ def twint_prediction(data_filename, model_name=MODEL_NAME, model_version=MODEL_V
     data_sample = data[["tweet", "polarity"]]
     name = f"predictions_{remove_csv_extension(data_filename)}{model_version}.csv"
     path = os.path.join('green_mood_tracker', 'raw_data', name)
+    parent_dir = str(Path(path).parent)
+
+    if(not os.path.isdir(parent_dir)):
+        os.makedirs(parent_dir)
     data_sample.to_csv(path, index=False)
     print("prediction saved")
     print(colored(f'total prediction time: {int(time.time() - tic)}', 'green'))
@@ -132,9 +137,9 @@ def evaluate_model_on_gold_standard(model_name=MODEL_NAME, model_version=MODEL_V
 
 
 if __name__ == '__main__':
-    evaluate_model_on_gold_standard(
-        model_name=MODEL_NAME, model_version='v2',
-        download_gcp=False, encode=True, binary=True)
+    # evaluate_model_on_gold_standard(
+    #     model_name=MODEL_NAME, model_version='v2',
+    #     download_gcp=False, encode=True, binary=True)
     # data_filename = 'city.csv'
     # data = get_twint_data(data_filename, local=True)
     # encode_data(data, data_filename, model_name=MODEL_NAME)
@@ -143,3 +148,4 @@ if __name__ == '__main__':
     #                       model_version=MODEL_VERSION, download_gcp=False,
     #                       encode=False)
     # print(df.head(5))
+    twint_prediction('twint_test/uktest.csv', encode=True)
