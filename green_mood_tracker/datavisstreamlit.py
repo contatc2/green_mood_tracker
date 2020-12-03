@@ -10,6 +10,8 @@ import plotly as py
 import plotly.graph_objects as go
 import pickle
 from green_mood_tracker.data_cleaning import clean
+from geojson_rewind import rewind
+import json
 model_load = TFRobertaForSequenceClassification.from_pretrained('models/model_roBERTa_test_distil')
 
 
@@ -108,16 +110,21 @@ def altair_data(cum_plot_df):
 	return altrair_like_sum,  altrair_sent_sum
 
 
-def plot_map(cum_plot_df):
+def plot_map(cum_plot_df, country='US'):
 	cum_plot_df['year'] = pd.DatetimeIndex(cum_plot_df['date']).year
 	cum_plot_df['month'] = pd.DatetimeIndex(cum_plot_df['date']).month
+	if country == "UK":
+		with open('green_mood_tracker/raw_data/uk_regions.geojson') as f:
+			data = json.load(f)
 
+		data_wind = rewind(data, rfc7946=False)
 
 	# your color-scale
-	scl = [[0.0, '#ffffff'],[0.2, '#b4a8ce'],[0.4, '#8573a9'],
-		   [0.6, '#7159a3'],[0.8, '#5732a1'],[1.0, '#2c0579']] # purples
+	scl = [[0.0, "#800000"],[0.25, '#ff0000'],[0.5, '#ffa500'],
+		   [0.75, '#00ff00'],[1.0, '#008000']] # purples
 
 	data_slider = []
+	figs_uk=[]
 	altair_sent_by_year = []
 	altair_like_by_year = []
 	for year in cum_plot_df['year'].unique():
@@ -142,19 +149,32 @@ def plot_map(cum_plot_df):
 
 		# df_segmented = df_segmented_year_cumulative.groupby('state_code').last()[['year','pos-per']].reset_index()
 
-		for col in df_segmented.columns:
-			df_segmented[col] = df_segmented[col].astype(str)
 
-		data_each_yr = dict(
-							type='choropleth',
-							locations = df_segmented['state_code'],
-							z=df_segmented['polarity_av'].astype(float),
-							locationmode='USA-states',
-							colorscale = px.colors.sequential.Greens,
-							colorbar= {'title':'Positive sentiment Percentage'})
+		if country == 'US':
+			for col in df_segmented.columns:
+				df_segmented[col] = df_segmented[col].astype(str)
+			data_each_yr = dict(
+								type='choropleth',
+								locations = df_segmented['state_code'],
+								z=df_segmented['polarity_av'].astype(float),
+								locationmode='USA-states',
+								colorscale = scl,
+								zmin=-1,
+								zmax=1,
+								colorbar= {'title':'Positive sentiment Percentage'})
 
-		data_slider.append(data_each_yr)
-
+			data_slider.append(data_each_yr)
+		elif country == 'UK':
+			fig_2 = px.choropleth(df_segmented, geojson=data_wind, color='polarity_av',
+					locations='state_code', featureidkey="properties.rgn19nm",
+					projection="mercator",
+					scope='europe',
+					range_color = [1,-1],
+					#color_continuous_scale=px.colors.sequential.Plasma
+					color_continuous_scale = scl
+				   )
+			fig_2.update_geos(fitbounds="locations", visible=False)
+			figs_uk.append(fig_2)
 	#steps = []
 	#for i in range(len(data_slider)):
 		#step = dict(method='restyle',
@@ -164,13 +184,20 @@ def plot_map(cum_plot_df):
 		#steps.append(step)
 
 	#sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
+	if country == 'US':
+		layout = dict(geo=dict(scope='usa',
+							   projection={'type': 'albers usa'}),
+					  )
+		return altair_sent_by_year, altair_like_by_year, layout, data_slider
 
-	layout = dict(geo=dict(scope='usa',
-						   projection={'type': 'albers usa'}),
-				  )
+	elif country == 'UK':
+		return altair_sent_by_year, altair_like_by_year, figs_uk
+
+
+
 	#print(data_slider)
 	#fig = go.Figure(data=st_year, layout=layout)
-	return altair_sent_by_year, altair_like_by_year, layout, data_slider
+
 	#fig.show()
 
 def altair_plot_like(altair_like_by_year,year):
@@ -220,7 +247,7 @@ def altair_plot_tweet(altair_sent_by_year,year):
 #			   alt.Tooltip("Sentiment:N")
 #			  ])])
 #fig_pie.update_traces(hoverinfo='label+percent', textinfo='value', textfont_size=20,
-	                 #marker=dict(colors=colors, line=dict(color='#000000', width=2))
+					 #marker=dict(colors=colors, line=dict(color='#000000', width=2))
 #	return fig_pie
 
 def all_plotting(topic="['solar', 'energy']"):
@@ -230,6 +257,7 @@ def all_plotting(topic="['solar', 'energy']"):
 
 	ds_twint_encoded, df_clean = cleantopic(us_twint)
 	submission_pre = results(ds_twint_encoded, df_clean)
+
 	comment_dataframe = comment_dataframe_prep(df_clean, submission_pre)
 	comment_dataframe.to_csv("green_mood_tracker/raw_data/US/solar.csv")
 
