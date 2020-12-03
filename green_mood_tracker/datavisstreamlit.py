@@ -92,13 +92,24 @@ def cumulative_features(comment_dataframe):
     return cum_plot_df
 
 
-def polarity_calc(df_segmented_year):
-    df_segmented_year['count'] = 1
-    plotly_df = df_segmented_year.copy().groupby('state_code').agg(
-        {'prob_neg': 'sum', 'prob_pos': 'sum', 'count': 'count'}).reset_index()
-    plotly_df['polarity_av'] = plotly_df.copy().apply(
-        lambda x: (x['prob_pos']-x['prob_neg'])/x['count'], axis=1)
-    return plotly_df
+def polarity_calc(df_segmented_year,country='US', like_prediction = 'Per Tweet'):
+	df_segmented_year['nlikes'] = df_segmented_year['nlikes'].copy() + 1
+	if like_prediction == 'Per Tweet':
+		df_segmented_year['count'] = 1
+		plotly_df = df_segmented_year.copy().groupby('state_code').agg({'prob_neg': 'sum','prob_pos': 'sum','count':'count'}).reset_index()
+		plotly_df['polarity_av'] = plotly_df.copy().apply(lambda x: (x['prob_pos']-x['prob_neg'])/x['count'], axis=1)
+	elif like_prediction == 'Likes Per Tweet':
+		plotly_df = df_segmented_year.copy()
+		plotly_df['count'] = 1
+		plotly_df['like_polarity_pos'] = plotly_df.copy().apply(lambda x: (x['prob_pos']*x['nlikes']), axis=1)
+		plotly_df['like_polarity_neg'] = plotly_df.copy().apply(lambda x: (x['prob_neg']*x['nlikes']), axis=1)
+		plotly_df = plotly_df.copy().groupby('state_code').agg({'like_polarity_pos': 'sum','like_polarity_neg': 'sum','count':'count'}).reset_index()
+		plotly_df['polarity_av'] = plotly_df.copy().apply(lambda x: (x['like_polarity_pos']-x['like_polarity_neg'])/x['count'], axis=1)
+		#av_mean = plotly_df.polarity_av.mean()
+		#av_std = plotly_df.polarity_av.std()
+		#plotly_df['polarity_av_norm'] = plotly_df.copy().apply(lambda x: (x['polarity_av']- av_mean)/av_std, axis=1)
+	return plotly_df
+
 
 
 #cum_plot_df = cumulative_features(comment_dataframe)
@@ -137,130 +148,136 @@ def altair_data(cum_plot_df):
     return altrair_like_sum,  altrair_sent_sum
 
 
-def plot_map(cum_plot_df, country='US'):
-    cum_plot_df['year'] = pd.DatetimeIndex(cum_plot_df['date']).year
-    cum_plot_df['month'] = pd.DatetimeIndex(cum_plot_df['date']).month
-    if country == "UK":
-        with open('green_mood_tracker/raw_data/uk_regions.geojson') as f:
-            data = json.load(f)
+def plot_map(cum_plot_df, country='US',like_prediction = 'Per Tweet'):
 
-        data_wind = rewind(data, rfc7946=False)
+	cum_plot_df['year'] = pd.DatetimeIndex(cum_plot_df['date']).year
+	cum_plot_df['month'] = pd.DatetimeIndex(cum_plot_df['date']).month
+	if like_prediction == 'Per Tweet':
+		zmin = -1
+		zmax = 1
+	elif like_prediction == 'Likes Per Tweet':
+		zmin = -2
+		zmax = 2
 
-    # your color-scale
-    scl = [[0.0, "#800000"], [0.25, '#ff0000'], [0.5, '#ffa500'],
-           [0.75, '#00ff00'], [1.0, '#008000']]  # purples
+	if country == "UK":
+		with open('green_mood_tracker/raw_data/uk_regions.geojson') as f:
+			data = json.load(f)
 
-    data_slider = []
-    figs_uk = []
-    altair_sent_by_year = []
-    altair_like_by_year = []
-    for year in cum_plot_df['year'].unique():
+		data_wind = rewind(data, rfc7946=False)
+		cum_plot_df['state_code'] = cum_plot_df['state_code'].replace({"East of England":"East","Yorkshire":"Yorkshire and the Humber",})
 
-        df_segmented_year = cum_plot_df[(cum_plot_df['year'] == year)]
-        df_segmented = polarity_calc(df_segmented_year)
-        altrair_sent_final = pd.DataFrame(
-            columns=['date', 'Percentage of Sentiment', 'sentiment', 'month'])
-        altrair_like_final = pd.DataFrame(
-            columns=['date', 'Percentage of Likes Per Sentiment', 'sentiment', 'month'])
+	# your color-scale
+	scl = [[0.0, "#800000"],[0.25, '#ff0000'],[0.5, '#ffa500'],
+		   [0.75, '#00ff00'],[1.0, '#008000']] # purples
 
-        for month in df_segmented_year['month'].unique():
+	data_slider = []
+	altair_sent_by_year = []
+	altair_like_by_year = []
 
-            df_segmented_month = df_segmented_year[(
-                cum_plot_df['month'] == month)]
-            df_segmented_month_cumulative = cumulative_features(
-                df_segmented_month)
-            altrair_like_sum,  altrair_sent_sum = altair_data(
-                df_segmented_month_cumulative)
-            altrair_sent_final = pd.concat(
-                [altrair_sent_final, altrair_sent_sum], axis=0)
-            altrair_like_final = pd.concat(
-                [altrair_like_final, altrair_like_sum], axis=0)
+	for year in cum_plot_df['year'].unique():
 
-        altrair_sent_final = altrair_sent_final.sort_values(by='month')
-        altrair_like_final = altrair_like_final.sort_values(by='month')
-        altair_sent_by_year.append(altrair_sent_final)
-        altair_like_by_year.append(altrair_like_final)
+		df_segmented_year =  cum_plot_df[(cum_plot_df['year'] == year)]
+		df_segmented = polarity_calc(df_segmented_year, like_prediction = like_prediction)
+		altrair_sent_final = pd.DataFrame(columns = ['date','Percentage of Sentiment','sentiment','month'])
+		altrair_like_final = pd.DataFrame(columns = ['date','Percentage of Likes Per Sentiment','sentiment','month'])
 
-        # df_segmented = df_segmented_year_cumulative.groupby('state_code').last()[['year','pos-per']].reset_index()
+		for month in df_segmented_year['month'].unique():
 
-        if country == 'US':
-            for col in df_segmented.columns:
-                df_segmented[col] = df_segmented[col].astype(str)
-            data_each_yr = dict(
-                type='choropleth',
-                locations=df_segmented['state_code'],
-                z=df_segmented['polarity_av'].astype(float),
-                locationmode='USA-states',
-                colorscale=scl,
-                zmin=-1,
-                zmax=1,
-                colorbar={'title': 'Positive sentiment Percentage'})
+			df_segmented_month =  df_segmented_year[(cum_plot_df['month'] == month)]
+			df_segmented_month_cumulative = cumulative_features(df_segmented_month)
+			altrair_like_sum,  altrair_sent_sum = altair_data( df_segmented_month_cumulative)
+			altrair_sent_final = pd.concat([ altrair_sent_final,altrair_sent_sum],axis=0)
+			altrair_like_final = pd.concat([ altrair_like_final,altrair_like_sum],axis=0)
 
-            data_slider.append(data_each_yr)
-        elif country == 'UK':
-            fig_2 = px.choropleth(df_segmented, geojson=data_wind, color='polarity_av',
-                                  locations='state_code', featureidkey="properties.rgn19nm",
-                                  projection="mercator",
-                                  scope='europe',
-                                  range_color=[1, -1],
-                                  # color_continuous_scale=px.colors.sequential.Plasma
-                                  color_continuous_scale=scl
-                                  )
-            fig_2.update_geos(fitbounds="locations", visible=False)
-            figs_uk.append(fig_2)
-    #steps = []
-    # for i in range(len(data_slider)):
-        # step = dict(method='restyle',
-            #args=['visible', [False] * len(data_slider)],
-            # label='Year {}'.format(i + 2010))
-        #step['args'][1][i] = True
-        # steps.append(step)
+		altrair_sent_final = altrair_sent_final.sort_values(by='month')
+		altrair_like_final = altrair_like_final.sort_values(by='month')
+		altair_sent_by_year.append(altrair_sent_final)
+		altair_like_by_year.append(altrair_like_final)
 
-    #sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
-    if country == 'US':
-        layout = dict(geo=dict(scope='usa',
-                               projection={'type': 'albers usa'}),
-                      )
-        return altair_sent_by_year, altair_like_by_year, layout, data_slider
-
-    elif country == 'UK':
-        return altair_sent_by_year, altair_like_by_year, figs_uk
-
-    # print(data_slider)
-    #fig = go.Figure(data=st_year, layout=layout)
-
-    # fig.show()
+		# df_segmented = df_segmented_year_cumulative.groupby('state_code').last()[['year','pos-per']].reset_index()
 
 
-def altair_plot_like(altair_like_by_year, year):
-    source = altair_like_by_year[abs(year-2020)]
-    alt.data_transformers.disable_max_rows()
-    fig_alt = alt.Chart(source).mark_area().encode(
-        x="date:T",
-        y="Percentage of Likes Per Sentiment:Q",
-        color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
-        tooltip=[alt.Tooltip("date:T"),
-                 alt.Tooltip("Percentage of Likes Per Sentiment:Q"),
-                 alt.Tooltip("sentiment:N")
-                 ])
-    return fig_alt
+		if country == 'US':
+			for col in df_segmented.columns:
+				df_segmented[col] = df_segmented[col].astype(str)
+			data_each_yr = dict(
+								type='choropleth',
+								locations = df_segmented['state_code'],
+								z=df_segmented['polarity_av'].astype(float),
+								locationmode='USA-states',
+								colorscale = scl,
+								zmin=zmin,
+								zmax=zmax,
+								colorbar= {'title':'Sentiment Polarity Rating'})
+
+			data_slider.append(data_each_yr)
+		elif country == 'UK':
+			data_each_yr = dict(type='choropleth',
+                    locations = df_segmented['state_code'],
+                    z=df_segmented['polarity_av'].astype(float),
+                    geojson=data_wind,
+                    featureidkey="properties.rgn19nm",
+                    colorscale = scl,
+                    zmin=zmin,
+                    zmax=zmax,
+                    colorbar= {'title':'Sentiment Polarity Rating'})
+			data_slider.append(data_each_yr)
+	#steps = []
+	#for i in range(len(data_slider)):
+		#step = dict(method='restyle',
+					#args=['visible', [False] * len(data_slider)],
+					#label='Year {}'.format(i + 2010))
+		#step['args'][1][i] = True
+		#steps.append(step)
+
+	#sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
+	if country == 'US':
+		layout = dict(geo=dict(scope='usa',
+							   projection={'type': 'albers usa'}),
+					  )
+
+	elif country == 'UK':
+		layout = dict(geo=dict(scope='europe',
+                       projection={'type': 'mercator'}),)
+
+	return altair_sent_by_year, altair_like_by_year, layout, data_slider
 
 
-def altair_plot_tweet(altair_sent_by_year, year):
-    source = altair_sent_by_year[abs(year-2020)]
-    alt.data_transformers.disable_max_rows()
-    fig_alt = alt.Chart(source).mark_area().encode(
-        x="date:T",
-        y="Percentage of Sentiment:Q",
-        color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
-        tooltip=[alt.Tooltip("date:T"),
-                 alt.Tooltip("Percentage of Sentiment:Q"),
-                 alt.Tooltip("sentiment:N")
-                 ])
-    return fig_alt
+
+	#print(data_slider)
+	#fig = go.Figure(data=st_year, layout=layout)
+
+	#fig.show()
+
+def altair_plot_like(altair_like_by_year,year):
+	source =  altair_like_by_year[abs(year-2020)]
+	alt.data_transformers.disable_max_rows()
+	fig_alt = alt.Chart(source).mark_area().encode(
+	x="date:T",
+	y="Percentage of Likes Per Sentiment:Q",
+	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
+	tooltip = [alt.Tooltip("date:T"),
+			   alt.Tooltip("Percentage of Likes Per Sentiment:Q"),
+			   alt.Tooltip("sentiment:N")
+			  ])
+	return fig_alt
+
+def altair_plot_tweet(altair_sent_by_year,year):
+	source =  altair_sent_by_year[abs(year-2020)]
+	alt.data_transformers.disable_max_rows()
+	fig_alt = alt.Chart(source).mark_area().encode(
+	x="date:T",
+	y="Percentage of Sentiment:Q",
+	color=alt.Color("sentiment:N", scale=alt.Scale(scheme='yellowgreen')),
+	tooltip = [alt.Tooltip("date:T"),
+			   alt.Tooltip("Percentage of Sentiment:Q"),
+			   alt.Tooltip("sentiment:N")
+			  ])
+	return fig_alt
 
 
-# def altair_pie_tweet(altair_sent_by_year,year):
+
+#def altair_pie_tweet(altair_sent_by_year,year):
 
 
 #	source =  altair_sent_by_year[abs(year-2020)]
