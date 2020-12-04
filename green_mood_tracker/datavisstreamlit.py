@@ -13,6 +13,7 @@ from green_mood_tracker.data import clean
 from geojson_rewind import rewind
 import json
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import RobustScaler
 
 
 # model_load = TFRobertaForSequenceClassification.from_pretrained(
@@ -112,7 +113,7 @@ def polarity_calc(df_segmented_year, country='US', like_prediction='Per Tweet'):
 		plotly_df['polarity_av'] = plotly_df.copy().apply(lambda x: (
 			x['like_polarity_pos']-x['like_polarity_neg'])/x['count'], axis=1)
 
-		scaler = MinMaxScaler(feature_range=(-1, 1))
+		scaler = RobustScaler()
 
 		plotly_df['polarity_av'] = scaler.fit_transform(plotly_df[['polarity_av']])
 		#av_mean = plotly_df.polarity_av.mean()

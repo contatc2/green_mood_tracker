@@ -219,10 +219,10 @@ def main():
         st.text(" \n")
         if like_prediction == 'Per Tweet':
             st.markdown(
-                f'**Tweet Sentiment Polarity Rating Towards {topic_prediction} by State in the {country_prediction} in  {year}**')
+                f'**Tweet Sentiment Rating Towards {topic_prediction} in the {country_prediction} in  {year}**')
         elif like_prediction == 'Likes Per Tweet':
             st.markdown(
-                f'**Tweet Sentiment Polarity Rating Towards {topic_prediction} by State in the {country_prediction} in  {year}**')
+                f'**Tweet Sentiment Rating Towards {topic_prediction} in the {country_prediction} in  {year} Based on Likes **')
 
             #data = 'green_mood_tracker/raw_data/twint_US.csv'
             #df = pd.read_csv(data)
@@ -256,13 +256,21 @@ def main():
         st.plotly_chart(fig, use_container_width=True)
 
         st.text(" \n")
-        st.markdown(
-            f'**Evolution of Sentiment Share Towards {topic_prediction} in the {country_prediction} in {year}**')
+        if like_prediction == 'Per Tweet':
+	        st.markdown(
+	            f'**Evolution of Sentiment Share Towards {topic_prediction} in the {country_prediction} in {year}**')
+        if like_prediction == 'Likes Per Tweet':
+        	st.markdown(
+            f'**Evolution of Sentiment Share Towards {topic_prediction} in the {country_prediction} in {year} Based on Likes**')
         st.altair_chart(c, use_container_width=True)
 
         st.text(" \n")
-        st.markdown(
-            f'**Total Share of Each Sentiment Towards {topic_prediction} in the {country_prediction} in {year} **')
+        if like_prediction == 'Per Tweet':
+	        st.markdown(
+	        	f'**Total Share of Likes Per Sentiment Towards {topic_prediction} in the {country_prediction} in {year}**')
+        if like_prediction == 'Likes Per Tweet':
+        	st.markdown(
+            f'**Total Share of Likes Per Sentiment Towards {topic_prediction} in the {country_prediction} in {year}**')
         st.plotly_chart(fig_pie, use_container_width=True)
 
     if analysis == "Live Analysis":
