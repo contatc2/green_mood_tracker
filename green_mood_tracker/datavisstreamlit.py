@@ -12,6 +12,7 @@ import pickle
 from green_mood_tracker.data import clean
 from geojson_rewind import rewind
 import json
+from sklearn.preprocessing import MinMaxScaler
 
 
 # model_load = TFRobertaForSequenceClassification.from_pretrained(
@@ -110,6 +111,9 @@ def polarity_calc(df_segmented_year, country='US', like_prediction='Per Tweet'):
             {'like_polarity_pos': 'sum', 'like_polarity_neg': 'sum', 'count': 'count'}).reset_index()
         plotly_df['polarity_av'] = plotly_df.copy().apply(lambda x: (
             x['like_polarity_pos']-x['like_polarity_neg'])/x['count'], axis=1)
+        scaler = MinMaxScaler(feature_range=(-1, 1))
+
+		plotly_df['polarity_av'] = scaler.fit_transform(plotly_df[['polarity_av']])
         #av_mean = plotly_df.polarity_av.mean()
         #av_std = plotly_df.polarity_av.std()
         #plotly_df['polarity_av_norm'] = plotly_df.copy().apply(lambda x: (x['polarity_av']- av_mean)/av_std, axis=1)
@@ -161,8 +165,8 @@ def plot_map(cum_plot_df, country='US', like_prediction='Per Tweet'):
         zmax = 1
         colorbar = {'title': 'Sentiment Polarity Rating'}
     elif like_prediction == 'Likes Per Tweet':
-        zmin = -10
-        zmax = 10
+        zmin = -1
+        zmax = 1
         colorbar = {'title': 'Sentiment Popularity Polarity Rating'}
 
     if country == "UK":
