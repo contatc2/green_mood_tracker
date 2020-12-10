@@ -35,14 +35,14 @@
 # Project Description
 
 ## Methodology
-1 Identify datasets to train NLP models to identify polarity of tweets ( positive sentiment or negative sentiment)
-2 Data cleaning using NLTK library
-3 Train NLP models on sentiments datasets above (see models section)
-4 Extract tweets by city, topics, start date, end date using the twint API
-5 Create a test dataset of 200 tweets manually labelled to assess the model accuracy on energy tweets
-6 Use trained model to automatically label extracted tweets with positive or negative polarity
-7 Data visualisation using labelled tweets by location, topic and date
-8 Deploy streamlit app using GCP virtual machine
+1. Identify datasets to train NLP models to identify polarity of tweets ( positive sentiment or negative sentiment)
+2. Data cleaning using NLTK library
+3. Train NLP models on sentiments datasets above (see models section)
+4. Extract tweets by city, topics, start date, end date using the twint API
+5. Create a test dataset of 200 tweets manually labelled to assess the model accuracy on energy tweets
+6. Use trained model to automatically label extracted tweets with positive or negative polarity
+7. Data visualisation using labelled tweets by location, topic and date
+8. Deploy streamlit app using GCP virtual machine
 
 ## Training datasets
 - sentiment140 - link - this dataset was excluded as the labelling methodology was only using emojis (vs manual labelling for other datasets) and was not creating satisfactory accuracy with our models
