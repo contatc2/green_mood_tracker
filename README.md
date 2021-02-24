@@ -10,7 +10,7 @@
 - Henry Hall
 - Clementine Contat
 - Leonardo Gavaudan
-- Thomas Gianetti
+- [Thomas Gianetti](https://github.com/thomasgiannetti)
 
 ## Methods
 - Data scraping
@@ -19,18 +19,18 @@
 - Data Visualisation
 
 ## Technology/Package used
-- Twint API
+- [TWINT API](https://github.com/twintproject/twint)
 - NLTK
 - hugginface transformers RoBERTa
 - Gensim word2vec
 - Tensorflow Keras RNN
 - Scikit-Learn
-- Streamlit
-- deployed on Google Cloud Platform
 - K-means
 - Latent Dirichlet Allocation
 - Altoid
 - Wordcloud
+- Streamlit
+- Deployed on Google Cloud Platform
 
 # Project Description
 
@@ -45,10 +45,9 @@
 8. Deploy streamlit app using GCP virtual machine
 
 ## Training datasets
-- sentiment140 - link - this dataset was excluded as the labelling methodology was only using emojis (vs manual labelling for other datasets) and was not creating satisfactory accuracy with our models
-- STSGold - link
-- kaggleSentiment - link
-- other dataset - link
+- [sentiment140](http://help.sentiment140.com/for-students) this dataset was excluded as the labelling methodology was only using emojis (vs manual labelling for other datasets) and was not creating satisfactory accuracy with our models
+- [STSGold](https://raw.githubusercontent.com/pollockj/world_mood/master/sts_gold_v03/sts_gold_tweet.csv)
+- [kaggle Sentiment Analysis](https://www.kaggle.com/c/tweet-sentiment-extraction/data)
 
 ## Models
 - huggingface/transformers/RoBERTa, using distill roberta-base to speed up live analysis
