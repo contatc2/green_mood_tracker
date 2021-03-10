@@ -1,59 +1,8 @@
-from green_mood_tracker.encoders import RobertaEncoder
-from transformers import TFRobertaForSequenceClassification
-import tensorflow as tf
-import numpy as np
 import pandas as pd
+from sklearn.preprocessing import RobustScaler
 import altair as alt
-from vega_datasets import data
-import plotly.express as px
-import plotly as py
-import plotly.graph_objects as go
-import pickle
-from green_mood_tracker.data import clean
 from geojson_rewind import rewind
 import json
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import RobustScaler
-
-
-# model_load = TFRobertaForSequenceClassification.from_pretrained(
-#     'models/roBERTa.tf')
-
-def cleantopic(df, topic="['solar', 'energy']"):
-
-	df_topic = df[df['search'] == topic]
-
-	df_clean = clean(df_topic, 'tweet')
-
-	ds_twint_encoded = RobertaEncoder(batch_size=64).transform(
-		df_clean.tweet, df_clean.timezone, shuffle=True)
-
-	return ds_twint_encoded, df_clean
-
-
-def results(ds_twint_encoded, df_clean):
-	submission_pre = tf.nn.softmax(model_load.predict(ds_twint_encoded).logits)
-	submission_pre = np.reshape(submission_pre.numpy(), (len(df_clean), 2))
-	return submission_pre
-
-
-def comment_dataframe_prep(df_clean, submission_pre):
-	comment_dataframe = df_clean.copy()
-	comment_dataframe['nlikes'] = comment_dataframe['nlikes'].copy() + 1
-	comment_dataframe['prob_neg'] = 0
-	comment_dataframe['prob_pos'] = 0
-	comment_dataframe['prob_neg'] = submission_pre[:, 0]
-	comment_dataframe['prob_pos'] = submission_pre[:, 1]
-	comment_dataframe['label'] = comment_dataframe['prob_pos'].apply(
-		(lambda x: 2 if x >= 0.55 else (0 if x <= 0.45 else 1)))
-	comment_dataframe = comment_dataframe.drop_duplicates(
-		subset=['id'], keep='first')
-	comment_dataframe = comment_dataframe.drop_duplicates(
-		subset=['date'], keep='first')
-	comment_dataframe = comment_dataframe[comment_dataframe['date'] != '14502749']
-	comment_dataframe['date'] = comment_dataframe[[
-		'date']].apply(pd.to_datetime)
-	return comment_dataframe[['date', 'tweet', 'nlikes', 'label', 'prob_neg', 'prob_pos', 'state_code']]
 
 
 def cumulative_features(comment_dataframe):
@@ -172,7 +121,7 @@ def plot_map(cum_plot_df, country='US', like_prediction='Per Tweet'):
 		colorbar = {'title': 'Sentiment Popularity Polarity Rating'}
 
 	if country == "UK":
-		with open('green_mood_tracker/raw_data/uk_regions.geojson') as f:
+		with open('green_mood_tracker_app/raw_data/uk_regions.geojson') as f:
 			data = json.load(f)
 
 		data_wind = rewind(data, rfc7946=False)
@@ -181,7 +130,7 @@ def plot_map(cum_plot_df, country='US', like_prediction='Per Tweet'):
 
 	# your color-scale
 	scl = [[0.0, "#800000"], [0.25, '#ff0000'], [0.5, '#ffa500'],
-		   [0.75, '#00ff00'], [1.0, '#008000']]  # purples
+            [0.75, '#00ff00'], [1.0, '#008000']]  # purples
 
 	data_slider = []
 	altair_sent_by_year = []
@@ -232,88 +181,47 @@ def plot_map(cum_plot_df, country='US', like_prediction='Per Tweet'):
 
 			data_slider.append(data_each_yr)
 		elif country == 'UK':
-			data_each_yr = dict(type='choropleth',
-								locations=df_segmented['state_code'],
-								z=df_segmented['polarity_av'].astype(float),
-								geojson=data_wind,
-								featureidkey="properties.rgn19nm",
-								colorscale=scl,
-								zmin=zmin,
-								zmax=zmax,
-								colorbar=colorbar)
-			data_slider.append(data_each_yr)
+            data_each_yr = dict(type='choropleth',
+                        locations=df_segmented['state_code'],
+                        z=df_segmented['polarity_av'].astype(float),
+                        geojson=data_wind,
+                        featureidkey="properties.rgn19nm",
+                        colorscale=scl,
+                        zmin=zmin,
+                        zmax=zmax,
+                        colorbar=colorbar)
+		data_slider.append(data_each_yr)
 	#steps = []
 	# for i in range(len(data_slider)):
 		# step = dict(method='restyle',
-			#args=['visible', [False] * len(data_slider)],
-			# label='Year {}'.format(i + 2010))
+		#args=['visible', [False] * len(data_slider)],
+		# label='Year {}'.format(i + 2010))
 		#step['args'][1][i] = True
 		# steps.append(step)
 
 	#sliders = [dict(active=0, pad={"t": 1}, steps=steps)]
 	if country == 'US':
-		layout = dict(geo=dict(scope='usa',
-							   projection={'type': 'albers usa'}),
-					  )
+	layout = dict(geo=dict(scope='usa',
+                        projection={'type': 'albers usa'}),
+               )
 
 	elif country == 'UK':
-		layout = dict(geo=dict(scope='europe',
-							   projection={'type': 'mercator'}),)
+	layout = dict(geo=dict(scope='europe',
+                        projection={'type': 'mercator'}),)
 
 	return altair_sent_by_year, altair_like_by_year, layout, data_slider
 
-	# print(data_slider)
-	#fig = go.Figure(data=st_year, layout=layout)
 
-	# fig.show()
-
-
-def altair_plot_like(altair_like_by_year, year):
-	source = altair_like_by_year[abs(year-2020)]
+def altair_plot(altair_data_year, year, data_type='Per Tweet', y_label='Percentage of Sentiment'):
+	source = altair_data_year[abs(year-2020)]
 	alt.data_transformers.disable_max_rows()
 	fig_alt = alt.Chart(source).mark_area().encode(
-		x="date:T",
-		y="Percentage of Likes Per Sentiment:Q",
-		color=alt.Color("sentiment:N", scale=alt.Scale(domain=[
-						'Negative', 'Neutral', 'Positive'], range=['#cc2936', '#FFA500', '#00B050'])),
-		tooltip=[alt.Tooltip("date:T"),
-				 alt.Tooltip("Percentage of Likes Per Sentiment:Q"),
-				 alt.Tooltip("sentiment:N")
-
-				 ])
+            x="date:T",
+            y=f"{y_label}:Q",
+            color=alt.Color("sentiment:N", scale=alt.Scale(domain=[
+                'Negative', 'Neutral', 'Positive'], range=['#cc2936', '#FFA500', '#00B050'])),
+            tooltip=[alt.Tooltip("date:T"),
+                     alt.Tooltip(f"{y_label}:Q"),
+                     alt.Tooltip("sentiment:N")
+                     ])
 	return fig_alt
-
-
-def altair_plot_tweet(altair_sent_by_year, year):
-	source = altair_sent_by_year[abs(year-2020)]
-	alt.data_transformers.disable_max_rows()
-	fig_alt = alt.Chart(source).mark_area().encode(
-		x="date:T",
-		y="Percentage of Sentiment:Q",
-		color=alt.Color("sentiment:N", scale=alt.Scale(domain=[
-						'Negative', 'Neutral', 'Positive'], range=['#cc2936', '#FFA500', '#00B050'])),
-		tooltip=[alt.Tooltip("date:T"),
-				 alt.Tooltip("Percentage of Sentiment:Q"),
-				 alt.Tooltip("sentiment:N")
-				 ])
-	return fig_alt
-
-# domain=['Negative', 'Neutral', 'Positive'],range=['#800000', '#FFA500', '#008000']
-
-
-def all_plotting(topic="['solar', 'energy']"):
-	us_twint = pd.read_csv('green_mood_tracker/raw_data/twint_US.csv',
-						   dtype={"date": "string", "tweet": "string"})
-	uk_twint = pd.read_csv('green_mood_tracker/raw_data/twint_data_UK.csv',
-						   dtype={"date": "string", "tweet": "string"})
-
-	ds_twint_encoded, df_clean = cleantopic(us_twint)
-	submission_pre = results(ds_twint_encoded, df_clean)
-
-	comment_dataframe = comment_dataframe_prep(df_clean, submission_pre)
-	comment_dataframe.to_csv("green_mood_tracker/raw_data/US/solar.csv")
-
-
-if __name__ == "__main__":
-	#df = read_data()
-	all_plotting(topic="['solar', 'energy']")
