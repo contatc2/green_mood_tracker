@@ -4,7 +4,7 @@ import numpy as np
 import time
 from termcolor import colored
 
-from green_mood_tracker.gcp import download_model_files, load_model
+from green_mood_tracker.gcp import download_model_files, load_local_model
 from green_mood_tracker.data import clean
 from green_mood_tracker.encoders import RobertaEncoder, Word2VecEncoder
 from green_mood_tracker.params import BUCKET_NAME, MODEL_NAME, MODEL_VERSION, TWINT_TEST_FILE, MAX_LENGTH, DATA_FOLDER, TWINT_FOLDER, ROBERTA_MODEL
@@ -97,7 +97,7 @@ def twint_prediction(data_filename, model_name=MODEL_NAME, model_version=MODEL_V
         f'download files from gcp time: {int(time.time() - tic_download)}', 'green'))
 
     tic_model = time.time()
-    model = load_model(model_name=model_name)
+    model = load_local_model(model_name=model_name)
     print(colored(f'load model time: {int(time.time() - tic_model)}', 'green'))
     data = get_twint_data(data_filename, local=local)
     if encode:
@@ -130,7 +130,7 @@ def evaluate_model_on_gold_standard(model_name=MODEL_NAME, model_version=MODEL_V
     if download_gcp:
         download_model_files(model_name=model_name,
                              model_version=model_version)
-    model = load_model(model_name=model_name)
+    model = load_local_model(model_name=model_name)
     y_pred = generate_prediction(
         data_filename, model, model_name=MODEL_NAME, binary=True)
     return evaluate_model(y_true, y_pred)

@@ -91,7 +91,7 @@ def download_model_files(bucket_name=BUCKET_NAME, model_name=MODEL_NAME, model_v
     print(colored(f"=> {model_filename} downloaded from storage", 'green'))
 
 
-def load_model(model_name=MODEL_NAME, rm=False):
+def load_local_model(model_name=MODEL_NAME, rm=False):
     root = MODELS_FOLDER
 
     if model_name == ROBERTA_MODEL:
