@@ -16,6 +16,7 @@ tensorflow-datasets
 transformers
 tensorflow
 gensim
+scikit-learn
 google-cloud-storage
 mlflow
 termcolor
@@ -33,3 +34,5 @@ datetime
 altair
 plotly
 vega-datasets
+fastapi
+uvicorn

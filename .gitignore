@@ -10,6 +10,7 @@ groupama/data/base_pno.*
 .DS_Store
 .idea/
 green_mood_tracker/raw_data/
+green_mood_tracker.egg-info
 notebooks/download_train-Leonardo.ipynb
 notebooks/contatc2_cloud-test.ipynb
 models/

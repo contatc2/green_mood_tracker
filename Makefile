@@ -91,3 +91,8 @@ gcp_submit_training:
 		--scale-tier CUSTOM \
 		--master-machine-type ${MACHINE_TYPE}\
 		--stream-logs
+
+##### Prediction API - - - - - - - - - - - - - - - - - - - - - - - - -
+
+run_api:
+	uvicorn api.fast:app --reload  # load web server with code autoreload
